@@ -53,15 +53,20 @@ response = client.responses.create(
 对于 token 敏感的场景，按需加载：
 
 ```bash
-# 只加载 fuzzy-understanding 和 problem-solving
+# 只加载总入口，显式调用 scientific-learning 时由它做简版路由
+cat RULES.md > router-system.txt
+cat skills/scientific-learning/SKILL.md >> router-system.txt
+
+# 或加载总入口 + 高频子 skill
 cat RULES.md > custom-system.txt
+cat skills/scientific-learning/SKILL.md >> custom-system.txt
 cat skills/fuzzy-understanding/SKILL.md >> custom-system.txt
 cat skills/problem-solving/SKILL.md >> custom-system.txt
 ```
 
 ## 注意事项
 
-- **Token 预算**：全部 8 个 Skill 合成后约 20K-30K tokens。如果模型上下文窗口较小，建议按需加载 2-3 个 Skill。
+- **Token 预算**：全部 9 个 Skill（1 个总入口 + 8 个子 skill）合成后约 20K-30K tokens。如果模型上下文窗口较小，建议只加载总入口，或加载总入口 + 2-3 个高频子 skill。
 - **o1/o3 系列**：这些模型的系统消息会被转为用户消息。确认规则内容以用户消息形式传入也能被遵循。
 - **Memory**：GPT 模型无原生文件系统。Memory 功能（间隔复习、薄弱点追踪）需要外部存储支持（如通过 Function Calling 访问数据库或文件 API）。
 

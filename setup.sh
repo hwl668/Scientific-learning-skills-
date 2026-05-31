@@ -30,6 +30,7 @@ MEMORY_SRC="$SCRIPT_DIR/memory"
 # 需要初始化的 memory 子目录（分析记忆 + 内容记忆）
 MEMORY_DIRS=(
     zero-base-learning
+    scientific-learning
     fuzzy-understanding
     deepening-learning
     problem-solving

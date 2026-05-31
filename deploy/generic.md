@@ -30,11 +30,16 @@ done
 
 ### 3. Token 优化
 
-全部 8 个 Skill 约 20K-30K tokens。如需精简：
+全部 9 个 Skill（1 个总入口 + 8 个子 skill）约 20K-30K tokens。如需精简：
 
 ```bash
+# 只保留总入口，让它做路由和简版兜底
+cat RULES.md > router-prompt.md
+cat skills/scientific-learning/SKILL.md >> router-prompt.md
+
 # 只保留最常用的 3-4 个 Skill
 cat RULES.md > minimal-prompt.md
+cat skills/scientific-learning/SKILL.md >> minimal-prompt.md
 cat skills/fuzzy-understanding/SKILL.md >> minimal-prompt.md
 cat skills/problem-solving/SKILL.md >> minimal-prompt.md
 cat skills/mistake-review/SKILL.md >> minimal-prompt.md

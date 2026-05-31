@@ -61,10 +61,11 @@ Q2: 为什么说实践是检验真理的唯一标准？
 Q3: 关键词"直接现实性"→ 请复述相关要点。
 ```
 
-**8 个 Skill，覆盖学习的完整闭环：**
+**9 个 Skill，覆盖学习的完整闭环：**
 
 | 你在想什么 | 自动触发 |
 |-----------|---------|
+| "我不想选，直接用一个大的学习入口" | `scientific-learning` — 总入口，先路由再调用子 skill |
 | "完全没学过，这是什么" | `zero-base-learning` — 从直觉出发，不堆公式 |
 | "学过但云里雾里" | `fuzzy-understanding` — 诊断卡点，只修裂口 |
 | "已经懂了，想更深入" | `deepening-learning` — 多视角/反例/跨知识联系 |
@@ -167,7 +168,7 @@ Skills 本质是结构化 Markdown 指令集，不依赖特定平台。将 RULES
 | Cursor / Cline / Copilot | 规则文件或自定义指令 | [详细说明](./deploy/generic.md) |
 | 任意智能体 | 系统提示注入 | [详细说明](./deploy/generic.md) |
 
-Token 预算：全部 8 个 Skill 约 20K-30K tokens。可按需只加载 2-3 个。
+Token 预算：全部 9 个 Skill 约 20K-30K tokens。可按需只加载总入口或 2-3 个子 skill。
 
 ### Memory 支持矩阵
 
@@ -210,6 +211,13 @@ Token 预算：全部 8 个 Skill 约 20K-30K tokens。可按需只加载 2-3 �
 
 # 复习计划
 > 两个月自学线代通过期末考，每天 1.5 小时，基础只会矩阵乘法。
+```
+
+也可以显式调用总入口：
+
+```text
+> /scientific-learning 矩阵乘法是什么？
+> 用 scientific-learning 帮我处理这个学习问题：这题我卡住了……
 ```
 
 **记忆管理：**

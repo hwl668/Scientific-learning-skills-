@@ -35,6 +35,6 @@
 
 ## v1.0
 
-- [ ] 所有 8 个 Skill 经过 100+ 用户验证
+- [ ] 8 个子 Skill 和 1 个总入口 Skill 经过 100+ 用户验证
 - [ ] 完整的社区贡献体系（skill registry + review process）
 - [ ] 可复现的 benchmark 论文/技术报告
