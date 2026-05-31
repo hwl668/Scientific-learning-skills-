@@ -197,7 +197,7 @@ Memory 系统（间隔复习、薄弱点追踪）依赖文件系统读写。在�
 
 ### Skill 选择：隐式触发而非手动切换
 
-用户不需要打 `/零基础学习` 这样的命令，自然描述问题本身就是选择。决策树在 `CLAUDE.md` 中定义，根据关键词和描述特征自动路由。
+用户不需要打 `/零基础学习` 这样的命令，自然描述问题本身就是选择。决策树在 `RULES.md` 中定义，根据关键词和描述特征自动路由。
 
 ### Skill 转交：对话中的协作
 
@@ -224,7 +224,7 @@ Memory 系统（间隔复习、薄弱点追踪）依赖文件系统读写。在�
 
 ## 延伸阅读
 
-- [CLAUDE.md](./CLAUDE.md) — 总规则层：决策树、转交规则、Memory 架构
+- [RULES.md](./RULES.md) — 总规则层：决策树、转交规则、Memory 架构
 - [docs/learning-methodology.md](./docs/learning-methodology.md) — 学习方法论详解
 - [docs/design-principles.md](./docs/design-principles.md) — 早期设计原则记录
 - [docs/roadmap.md](./docs/roadmap.md) — 版本路线图
