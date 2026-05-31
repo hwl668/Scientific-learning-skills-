@@ -1,0 +1,31 @@
+{
+  "name": "scientific-learning-skills",
+  "version": "0.1.0",
+  "description": "Student-facing Agent Skills: diagnostic tutoring, spaced review, mistake analysis. Turns AI from answer machine into diagnostic tutor.",
+  "author": "",
+  "license": "MIT",
+  "keywords": ["education", "learning", "tutoring", "stem", "spaced-repetition", "diagnostic"],
+  "skills": [
+    "zero-base-learning",
+    "fuzzy-understanding",
+    "deepening-learning",
+    "problem-solving",
+    "mistake-review",
+    "study-plan-builder",
+    "word-deep-dive",
+    "text-memorizer"
+  ],
+  "entrypoint": "RULES.md",
+  "platforms": ["claude-code", "codex", "openclaw", "cursor", "generic"],
+  "memory": {
+    "supported": true,
+    "engine": "memory/review-engine.md",
+    "platforms": {
+      "claude-code": "full",
+      "codex": "none (requires external storage)",
+      "openclaw": "depends on runtime",
+      "cursor": "limited (project directory only)",
+      "generic": "depends on runtime"
+    }
+  }
+}

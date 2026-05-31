@@ -1,0 +1,23 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude
+.claude/cache/
+.claude/sessions/
+
+# Temp
+*.tmp
+*.log
+
+# User memory data (privacy — do not commit personal learning data)
+memory/*/*.json
+memory/*/*.csv
+memory/*/*.md
+!memory/review-engine.md

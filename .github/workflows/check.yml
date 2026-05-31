@@ -1,0 +1,105 @@
+name: Check
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  frontmatter:
+    name: Frontmatter & Structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check SKILL.md frontmatter
+        run: |
+          errors=0
+          for skill in skills/*/SKILL.md; do
+            name=$(basename "$(dirname "$skill")")
+            echo "::group::$name"
+
+            # Check YAML frontmatter exists
+            if ! head -1 "$skill" | grep -q '^---$'; then
+              echo "  FAIL: missing YAML frontmatter"
+              errors=$((errors + 1))
+              echo "::endgroup::"
+              continue
+            fi
+
+            # Extract frontmatter (between first two ---)
+            fm=$(sed -n '/^---$/,/^---$/p' "$skill" | sed '1d;$d')
+
+            # Check required fields
+            if ! echo "$fm" | grep -q '^name:'; then
+              echo "  FAIL: missing 'name' field"
+              errors=$((errors + 1))
+            fi
+
+            if ! echo "$fm" | grep -q '^description:'; then
+              echo "  FAIL: missing 'description' field"
+              errors=$((errors + 1))
+            fi
+
+            # Check P0: 常见误区 section
+            if ! grep -q '常见误区\|常见错误\|误区' "$skill"; then
+              echo "  FAIL: missing P0 '常见误区' section"
+              errors=$((errors + 1))
+            fi
+
+            # Check anti-pattern: empty encouragement
+            if grep -qE '(加油|你能行|坚持就是胜利|come on)' "$skill"; then
+              echo "  WARN: contains empty encouragement phrases"
+            fi
+
+            echo "  OK: frontmatter valid, P0 present"
+            echo "::endgroup::"
+          done
+
+          if [ $errors -gt 0 ]; then
+            echo "::error::$errors skill(s) have issues"
+            exit 1
+          fi
+          echo "All $(( $(ls skills/*/SKILL.md | wc -l) )) skills pass checks"
+
+  eval-quick:
+    name: Eval (quick)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run eval
+        run: |
+          python3 eval.py --quick
+          echo "Eval passed"
+
+  links:
+    name: Link Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check internal links
+        run: |
+          errors=0
+          for md in README.md DESIGN.md CONTRIBUTING.md; do
+            echo "::group::$md"
+            # Extract markdown links: [text](path)
+            links=$(grep -oP '\[.*?\]\(\.\/[^)]+\)' "$md" || true)
+            while IFS= read -r link; do
+              # Extract path from [text](path)
+              path=$(echo "$link" | grep -oP '(?<=\(\.\/)[^)]+')
+              if [ -n "$path" ] && [ ! -e "$path" ]; then
+                # Check if it's a section anchor
+                if [[ "$path" != *"#"* ]] || [ ! -e "${path%%#*}" ]; then
+                  echo "  BROKEN: $link"
+                  errors=$((errors + 1))
+                fi
+              fi
+            done <<< "$links"
+            echo "::endgroup::"
+          done
+
+          if [ $errors -gt 0 ]; then
+            echo "::warning::$errors broken link(s) found"
+          else
+            echo "All links valid"
+          fi
