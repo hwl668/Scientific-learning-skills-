@@ -85,8 +85,9 @@ jobs:
             # Extract markdown links: [text](path)
             links=$(grep -oP '\[.*?\]\(\.\/[^)]+\)' "$md" || true)
             while IFS= read -r link; do
+              [ -z "$link" ] && continue
               # Extract path from [text](path)
-              path=$(echo "$link" | grep -oP '(?<=\(\.\/)[^)]+')
+              path=$(echo "$link" | grep -oP '(?<=\(\.\/)[^)]+') || true
               if [ -n "$path" ] && [ ! -e "$path" ]; then
                 # Check if it's a section anchor
                 if [[ "$path" != *"#"* ]] || [ ! -e "${path%%#*}" ]; then
