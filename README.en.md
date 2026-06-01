@@ -4,11 +4,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Platforms](https://img.shields.io/badge/Platform-Claude%20Code%20|%20Codex%20|%20OpenClaw%20|%20GPTs%20|%20Generic-lightgrey)]()
-[![Try scientific-learning-agent online](https://socialistic.ai/api/embed/scientific-learning-agent-a8f23b?lang=en)](https://socialistic.ai/en/skill/scientific-learning-agent-a8f23b?utm_source=github&utm_medium=readme&utm_campaign=20260601-gaokao-ai-study-workflows&utm_content=badge)
 
-[Try Online](https://socialistic.ai/en/skill/scientific-learning-agent-a8f23b?utm_source=github&utm_medium=readme&utm_campaign=20260601-gaokao-ai-study-workflows&utm_content=text) · [中文版](./README.md)
-
-> The online entry is hosted by socialistic.ai as a third-party experience. The repository remains the source of truth for the full framework, local evaluation, and memory behavior.
+[中文版](./README.md)
 
 ---
 

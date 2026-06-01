@@ -4,11 +4,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Platforms](https://img.shields.io/badge/Platform-Claude%20Code%20|%20Codex%20|%20OpenClaw%20|%20GPTs%20|%20Generic-lightgrey)]()
-[![在线试用 scientific-learning-agent](https://socialistic.ai/api/embed/scientific-learning-agent-a8f23b?lang=zh)](https://socialistic.ai/zh/skill/scientific-learning-agent-a8f23b?utm_source=github&utm_medium=readme&utm_campaign=20260601-gaokao-ai-study-workflows&utm_content=badge)
 
-[Quick Start](#快速开始) · [在线试用](https://socialistic.ai/zh/skill/scientific-learning-agent-a8f23b?utm_source=github&utm_medium=readme&utm_campaign=20260601-gaokao-ai-study-workflows&utm_content=text) · [Demo](./demo/) · [Eval](#快速开始) · [对比实测](#有它-vs-没有它) · [Platforms](#安装到其他平台) · [English](./README.en.md)
-
-> 在线试用入口由 socialistic.ai 第三方托管，适合快速体验；完整工程能力、评测和本地 memory 以本仓库为准。
+[Quick Start](#快速开始) · [Demo](./demo/) · [Eval](#快速开始) · [对比实测](#有它-vs-没有它) · [Platforms](#安装到其他平台) · [English](./README.en.md)
 
 ---
 
