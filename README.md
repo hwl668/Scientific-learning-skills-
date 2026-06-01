@@ -4,8 +4,11 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Platforms](https://img.shields.io/badge/Platform-Claude%20Code%20|%20Codex%20|%20OpenClaw%20|%20GPTs%20|%20Generic-lightgrey)]()
+[![在线试用 scientific-learning-agent](https://socialistic.ai/api/embed/scientific-learning-agent-a8f23b?lang=zh)](https://socialistic.ai/zh/skill/scientific-learning-agent-a8f23b?utm_source=github&utm_medium=readme&utm_campaign=20260601-gaokao-ai-study-workflows&utm_content=badge)
 
-[Quick Start](#快速开始) · [Demo](./demo/) · [Eval](#快速开始) · [对比实测](#有它-vs-没有它) · [Platforms](#安装到其他平台) · [English](./README.en.md)
+[Quick Start](#快速开始) · [在线试用](https://socialistic.ai/zh/skill/scientific-learning-agent-a8f23b?utm_source=github&utm_medium=readme&utm_campaign=20260601-gaokao-ai-study-workflows&utm_content=text) · [Demo](./demo/) · [Eval](#快速开始) · [对比实测](#有它-vs-没有它) · [Platforms](#安装到其他平台) · [English](./README.en.md)
+
+> 在线试用入口由 socialistic.ai 第三方托管，适合快速体验；完整工程能力、评测和本地 memory 以本仓库为准。
 
 ---
 
@@ -156,9 +159,9 @@ zero-base-learning-limit    18/20 PASS
 word-deep-dive-undermine    17/20 PASS  [word rubric]
 ```
 
-## v0.2: Learning Agent Framework
+## v0.2 / v0.3: Learning Agent Framework
 
-v0.2 将项目从 Skill Pack 升级为可运行的 Learning Agent Framework。Skill 仍然负责教学行为，框架模块负责路由、诊断、记忆调度、评测、部署编译和标准案例管理。
+v0.2 将项目从 Skill Pack 升级为可运行的 Learning Agent Framework。Skill 仍然负责教学行为，框架模块负责路由、诊断、记忆调度、评测、部署编译和标准案例管理。v0.3 增加了 learned router baseline，用训练数据学习 skill routing，并补上 `non-learning` 类，避免把模型身份、平台报错、付费问题等普通请求误路由到学习 skill。
 
 | 模块 | 作用 | 命令 |
 |------|------|------|
@@ -168,6 +171,7 @@ v0.2 将项目从 Skill Pack 升级为可运行的 Learning Agent Framework。Sk
 | Eval Runner | 运行 demo / JSONL suite，输出 text、JSON 或 Markdown 报告 | `python -m learning_agent.eval.runner --suite evals/cases/smoke.jsonl --report markdown` |
 | Prompt Compiler | 按平台、skill 选择和 token budget 生成 system prompt | `python -m learning_agent.compile --target codex --skills fuzzy,problem,word --output prompt.md --metadata` |
 | Subject Case Library | 管理大学专业课、算法、机器学习、系统课、建模和科研竞赛案例 | `python -m learning_agent.subjects --summary` |
+| Learned Router | TF-IDF char n-gram + Logistic Regression 路由基线，支持 top-k 和低置信度 fallback | `python -m learning_agent.ml_router predict "我会算矩阵乘法，但不知道它到底表示什么"` |
 
 核心数据集：
 
@@ -176,6 +180,7 @@ v0.2 将项目从 Skill Pack 升级为可运行的 Learning Agent Framework。Sk
 | `data/routing_cases.jsonl` | Router 标注评估 |
 | `data/diagnosis_cases.jsonl` | 认知卡点诊断评估 |
 | `data/subject_cases.jsonl` | 学科/科研场景覆盖 |
+| `data/training/router_training_v0.3.jsonl` | Learned Router 训练数据，含 hard negatives 和 non-learning |
 | `evals/cases/smoke.jsonl` | Eval Runner JSONL smoke suite |
 
 当前回归验证：
@@ -184,6 +189,7 @@ v0.2 将项目从 Skill Pack 升级为可运行的 Learning Agent Framework。Sk
 python -B -m unittest discover -s tests
 python -B -m learning_agent.router --eval
 python -B -m learning_agent.diagnosis --eval
+python -B -m learning_agent.ml_router evaluate
 python -B eval.py --quick
 python -B -m learning_agent.eval.runner --suite evals/cases/smoke.jsonl --report json
 ```
