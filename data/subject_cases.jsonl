@@ -1,0 +1,36 @@
+{"id":"calculus-limit-zero","subject":"calculus","scenario":"zero-base","prompt":"我完全不懂极限，极限到底是在研究什么？","skill":"zero-base-learning","diagnosis":"missing_prerequisite","rubric":"concept"}
+{"id":"calculus-epsilon-fuzzy","subject":"calculus","scenario":"fuzzy","prompt":"我会算极限，但不理解 ε-N 定义到底在干什么。","skill":"fuzzy-understanding","diagnosis":"symbol_not_understood","rubric":"concept"}
+{"id":"calculus-taylor-deep","subject":"calculus","scenario":"deepening","prompt":"泰勒公式中的余项到底控制了什么？","skill":"deepening-learning","diagnosis":"formula_without_understanding","rubric":"concept"}
+{"id":"linear-matrix-fuzzy","subject":"linear_algebra","scenario":"fuzzy","prompt":"我会算矩阵乘法，但不知道矩阵到底表示什么。","skill":"fuzzy-understanding","diagnosis":"formula_without_understanding","rubric":"concept"}
+{"id":"linear-rank-deep","subject":"linear_algebra","scenario":"deepening","prompt":"为什么秩-零化度定理很重要？","skill":"deepening-learning","diagnosis":"concept_confusion","rubric":"concept"}
+{"id":"linear-kernel-symbol","subject":"linear_algebra","scenario":"fuzzy","prompt":"为什么 A²=0 可以推出 Im(A) ⊆ Ker(A)？","skill":"fuzzy-understanding","diagnosis":"symbol_not_understood","rubric":"concept"}
+{"id":"probability-bayes-fuzzy","subject":"probability_statistics","scenario":"fuzzy","prompt":"我会用贝叶斯公式，但不知道公式背后的原理。","skill":"fuzzy-understanding","diagnosis":"formula_without_understanding","rubric":"concept"}
+{"id":"probability-density-zero","subject":"probability_statistics","scenario":"zero-base","prompt":"概率密度是什么？为什么连续变量不能直接说某个点的概率？","skill":"zero-base-learning","diagnosis":"missing_prerequisite","rubric":"concept"}
+{"id":"probability-pvalue-confusion","subject":"probability_statistics","scenario":"fuzzy","prompt":"p 值和显著性水平我总是分不清。","skill":"fuzzy-understanding","diagnosis":"concept_confusion","rubric":"concept"}
+{"id":"alg-dijkstra-negative","subject":"algorithms","scenario":"deepening","prompt":"Dijkstra 为什么不能有负权边？","skill":"deepening-learning","diagnosis":"derivation_gap","rubric":"concept"}
+{"id":"alg-kmp-next","subject":"algorithms","scenario":"fuzzy","prompt":"KMP 的 next 数组到底表示什么？","skill":"fuzzy-understanding","diagnosis":"symbol_not_understood","rubric":"concept"}
+{"id":"alg-dsu-compression","subject":"algorithms","scenario":"deepening","prompt":"并查集路径压缩为什么快？","skill":"deepening-learning","diagnosis":"derivation_gap","rubric":"concept"}
+{"id":"alg-dp-greedy","subject":"algorithms","scenario":"fuzzy","prompt":"DP 为什么不是贪心？我做题时总分不清。","skill":"fuzzy-understanding","diagnosis":"concept_confusion","rubric":"concept"}
+{"id":"ml-softmax-zero","subject":"machine_learning","scenario":"zero-base","prompt":"softmax 是什么？为什么输出可以看成概率？","skill":"zero-base-learning","diagnosis":"missing_prerequisite","rubric":"concept"}
+{"id":"ml-cross-entropy-fuzzy","subject":"machine_learning","scenario":"fuzzy","prompt":"交叉熵为什么适合分类？我会套公式但不知道为什么。","skill":"fuzzy-understanding","diagnosis":"formula_without_understanding","rubric":"concept"}
+{"id":"ml-batch-size-deep","subject":"machine_learning","scenario":"deepening","prompt":"batch size 为什么会影响训练稳定性和泛化？","skill":"deepening-learning","diagnosis":"concept_confusion","rubric":"concept"}
+{"id":"ml-resnet-fuzzy","subject":"machine_learning","scenario":"fuzzy","prompt":"ResNet 为什么要把输入加回去？","skill":"fuzzy-understanding","diagnosis":"formula_without_understanding","rubric":"concept"}
+{"id":"csapp-cache-zero","subject":"csapp","scenario":"zero-base","prompt":"Cache 是什么？为什么程序会有缓存命中和未命中？","skill":"zero-base-learning","diagnosis":"missing_prerequisite","rubric":"concept"}
+{"id":"csapp-locality-fuzzy","subject":"csapp","scenario":"fuzzy","prompt":"temporal locality 和 spatial locality 怎么区分？","skill":"fuzzy-understanding","diagnosis":"concept_confusion","rubric":"concept"}
+{"id":"csapp-cpi-fuzzy","subject":"csapp","scenario":"fuzzy","prompt":"CPI 和程序运行时间有什么关系？我会算但不知道意义。","skill":"fuzzy-understanding","diagnosis":"formula_without_understanding","rubric":"concept"}
+{"id":"os-process-thread","subject":"operating_systems","scenario":"fuzzy","prompt":"进程和线程有什么区别？为什么面试老问这个？","skill":"fuzzy-understanding","diagnosis":"concept_confusion","rubric":"concept"}
+{"id":"os-virtual-memory","subject":"operating_systems","scenario":"zero-base","prompt":"虚拟内存是什么？为什么程序看到的地址不是真实物理地址？","skill":"zero-base-learning","diagnosis":"missing_prerequisite","rubric":"concept"}
+{"id":"network-tcp-udp","subject":"computer_networks","scenario":"fuzzy","prompt":"TCP 和 UDP 我总是分不清什么时候用哪个。","skill":"fuzzy-understanding","diagnosis":"concept_confusion","rubric":"concept"}
+{"id":"network-congestion","subject":"computer_networks","scenario":"deepening","prompt":"TCP 拥塞控制为什么不是简单地一直加速发送？","skill":"deepening-learning","diagnosis":"derivation_gap","rubric":"concept"}
+{"id":"signals-fourier","subject":"signals_systems","scenario":"fuzzy","prompt":"傅里叶变换为什么能把信号拆成频率？","skill":"fuzzy-understanding","diagnosis":"formula_without_understanding","rubric":"concept"}
+{"id":"signals-convolution","subject":"signals_systems","scenario":"zero-base","prompt":"卷积到底是什么？为什么信号与系统里到处都是卷积？","skill":"zero-base-learning","diagnosis":"missing_prerequisite","rubric":"concept"}
+{"id":"control-feedback","subject":"automatic_control","scenario":"zero-base","prompt":"反馈控制是什么？为什么负反馈能让系统稳定？","skill":"zero-base-learning","diagnosis":"missing_prerequisite","rubric":"concept"}
+{"id":"control-pid","subject":"automatic_control","scenario":"fuzzy","prompt":"PID 里面 P、I、D 分别在调什么？我会背但不会用。","skill":"fuzzy-understanding","diagnosis":"rote_no_transfer","rubric":"concept"}
+{"id":"circuits-kcl-kvl","subject":"circuits","scenario":"fuzzy","prompt":"KCL 和 KVL 有什么区别？做电路题时什么时候用哪个？","skill":"fuzzy-understanding","diagnosis":"concept_confusion","rubric":"concept"}
+{"id":"circuits-opamp","subject":"circuits","scenario":"zero-base","prompt":"运放虚短虚断是什么？为什么可以这么分析？","skill":"zero-base-learning","diagnosis":"formula_without_understanding","rubric":"concept"}
+{"id":"modeling-variables","subject":"mathematical_modeling","scenario":"zero-base","prompt":"怎么把现实问题转成变量、目标函数和约束？","skill":"zero-base-learning","diagnosis":"missing_prerequisite","rubric":"concept"}
+{"id":"modeling-objective-constraint","subject":"mathematical_modeling","scenario":"fuzzy","prompt":"一个题目条件很多，我怎么知道哪些是变量，哪些是约束？","skill":"fuzzy-understanding","diagnosis":"concept_confusion","rubric":"concept"}
+{"id":"research-topic","subject":"research_competition","scenario":"plan","prompt":"怎么拆一个科研选题，判断它能不能做？","skill":"study-plan-builder","diagnosis":"missing_prerequisite","rubric":"concept"}
+{"id":"research-paper-reading","subject":"research_competition","scenario":"plan","prompt":"我第一次读论文，应该怎么读才不是从头翻译到尾？","skill":"study-plan-builder","diagnosis":"rote_no_transfer","rubric":"concept"}
+{"id":"research-baseline","subject":"research_competition","scenario":"plan","prompt":"怎么复现一篇论文的 baseline？","skill":"study-plan-builder","diagnosis":"missing_prerequisite","rubric":"concept"}
+{"id":"research-ablation","subject":"research_competition","scenario":"deepening","prompt":"消融实验到底在证明什么？怎么设计才有效？","skill":"deepening-learning","diagnosis":"concept_confusion","rubric":"concept"}

@@ -1,0 +1,48 @@
+{"text":"GIPS 和 CPI 我总是分不清，什么时候用哪个？","label":"concept_confusion","category":"concept"}
+{"text":"线性变换和矩阵到底是什么关系？我经常混淆。","label":"concept_confusion","category":"concept"}
+{"text":"欧拉路和哈密顿路有什么区别？","label":"concept_confusion","category":"concept"}
+{"text":"Dijkstra 和 Bellman-Ford 的差别在哪里？","label":"concept_confusion","category":"concept"}
+{"text":"协方差和相关系数到底是一个东西还是两个东西？","label":"concept_confusion","category":"concept"}
+{"text":"rank 和维数有什么关系？我老把它们混在一起。","label":"concept_confusion","category":"concept"}
+{"text":"连续和一致连续有什么不同？","label":"concept_confusion","category":"concept"}
+{"text":"充分条件和必要条件我总是分不清。","label":"concept_confusion","category":"concept"}
+{"text":"ε-N 定义里 ε 和 N 到底谁先给？","label":"symbol_not_understood","category":"symbol"}
+{"text":"∀ 和 ∃ 这两个量词放在一起我就看不懂。","label":"symbol_not_understood","category":"symbol"}
+{"text":"Im(A) ⊆ Ker(A) 这个符号关系是什么意思？","label":"symbol_not_understood","category":"symbol"}
+{"text":"Σ 上面的 n 和下面的 i=1 是什么意思？","label":"symbol_not_understood","category":"symbol"}
+{"text":"lim 下面写 x→0，这个记号具体在说什么？","label":"symbol_not_understood","category":"symbol"}
+{"text":"积分符号 ∫ 和 dx 我知道会写，但不知道各自表示什么。","label":"symbol_not_understood","category":"symbol"}
+{"text":"概率里 P(A|B) 的竖线是什么意思？","label":"symbol_not_understood","category":"symbol"}
+{"text":"矩阵 A^T 的上标 T 到底表示什么？","label":"symbol_not_understood","category":"symbol"}
+{"text":"我知道结论是 1/2，但泰勒展开中间步骤看不懂。","label":"derivation_gap","category":"derivation"}
+{"text":"证明里这一行为什么能推出下一行？","label":"derivation_gap","category":"derivation"}
+{"text":"老师说由 A²=0 得到 Im(A) ⊆ Ker(A)，这个推导我断了。","label":"derivation_gap","category":"derivation"}
+{"text":"洛必达法则这一步怎么变成下一步的？","label":"derivation_gap","category":"derivation"}
+{"text":"这个公式从上一行到下一行省略了什么？","label":"derivation_gap","category":"derivation"}
+{"text":"我能看懂最终答案，但证明过程跳步太多。","label":"derivation_gap","category":"derivation"}
+{"text":"递推式怎么得到通项公式，中间怎么得到的？","label":"derivation_gap","category":"derivation"}
+{"text":"KMP 的 next 数组构造过程我知道结果，但推导看不懂。","label":"derivation_gap","category":"derivation"}
+{"text":"我听不懂矩阵表示线性变换，因为变换是什么意思我都不清楚。","label":"missing_prerequisite","category":"prerequisite"}
+{"text":"我没学过向量空间，所以核空间和像空间都听不懂。","label":"missing_prerequisite","category":"prerequisite"}
+{"text":"学傅里叶之前需要先学什么？我感觉三角函数基础没学好。","label":"missing_prerequisite","category":"prerequisite"}
+{"text":"概率密度我不知道是什么，导致后面的期望听不懂。","label":"missing_prerequisite","category":"prerequisite"}
+{"text":"我不知道导数是什么，所以链式法则完全听不懂。","label":"missing_prerequisite","category":"prerequisite"}
+{"text":"算法复杂度没学过，导致我看不懂 Dijkstra 为什么快。","label":"missing_prerequisite","category":"prerequisite"}
+{"text":"我不知道空间是什么意思，所以向量空间这个词很抽象。","label":"missing_prerequisite","category":"prerequisite"}
+{"text":"我基础没学好，看到矩阵分解就不知道从哪补。","label":"missing_prerequisite","category":"prerequisite"}
+{"text":"例题我会做，但换一道题就不会了。","label":"rote_no_transfer","category":"transfer"}
+{"text":"我会背 Dijkstra 模板，但题型一变就不会用。","label":"rote_no_transfer","category":"transfer"}
+{"text":"泰勒展开照着例题会，换条件就不知道展开到几阶。","label":"rote_no_transfer","category":"transfer"}
+{"text":"我只会背欧拉回路定理，变式题完全不会。","label":"rote_no_transfer","category":"transfer"}
+{"text":"老师讲的题我照着会，自己做不会。","label":"rote_no_transfer","category":"transfer"}
+{"text":"这个公式例题里会套，一换场景就不知道该不该用。","label":"rote_no_transfer","category":"transfer"}
+{"text":"我背了 KMP 模板，但换一个字符串题就不会迁移。","label":"rote_no_transfer","category":"transfer"}
+{"text":"这种题我见过就会，没见过就完全想不到。","label":"rote_no_transfer","category":"transfer"}
+{"text":"矩阵乘法我会算，但不知道为什么要行乘列。","label":"formula_without_understanding","category":"formula"}
+{"text":"我会套求导公式，但不知道导数为什么表示变化率。","label":"formula_without_understanding","category":"formula"}
+{"text":"极限题我能机械计算，但不知道等价无穷小为什么可以替换。","label":"formula_without_understanding","category":"formula"}
+{"text":"我会用贝叶斯公式，但不知道公式背后的原理。","label":"formula_without_understanding","category":"formula"}
+{"text":"我能算行列式，但不知道行列式到底在量什么。","label":"formula_without_understanding","category":"formula"}
+{"text":"我会套最小二乘公式，但不知道为什么平方误差要最小。","label":"formula_without_understanding","category":"formula"}
+{"text":"我只会算矩阵特征值，不知道它为什么有意义。","label":"formula_without_understanding","category":"formula"}
+{"text":"泰勒公式我会用，但不知道为什么可以用多项式近似函数。","label":"formula_without_understanding","category":"formula"}

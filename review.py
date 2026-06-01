@@ -12,6 +12,11 @@ from datetime import date, datetime
 from pathlib import Path
 from collections import defaultdict
 
+from learning_agent.memory.scheduler import (
+    enrich_item,
+    sort_for_review,
+)
+
 # ── 终端颜色 ──────────────────────────────────────────────
 RED = "\033[0;31m"
 GREEN = "\033[0;32m"
@@ -106,11 +111,7 @@ def calc_review_stats(items):
             # 无 next_review = 未复习过 = 到期
             due_now.append(i)
 
-    # 按优先级排：streak=0 > 最早 next_review
-    due_now.sort(key=lambda x: (
-        0 if x.get("correct_streak", 0) == 0 else 1,
-        x.get("next_review") or "0000-00-00"
-    ))
+    due_now = sort_for_review(due_now, today)
 
     mastery_rate = (mastered / total * 100) if total > 0 else 0
 
@@ -129,11 +130,7 @@ def find_weakest(items, n=10):
         i for i in items
         if not (i.get("mastered") or i.get("correct_streak", 0) >= 5)
     ]
-    # 排序：streak 越低越薄弱，相同 streak 按 review_count 降序
-    active_items.sort(key=lambda x: (
-        x.get("correct_streak", 0),
-        -(x.get("review_count", 0))
-    ))
+    active_items = sort_for_review(active_items)
     return active_items[:n]
 
 
@@ -177,9 +174,13 @@ def print_review_section(label, items, get_name_fn):
             name = get_name_fn(item)
             streak = item.get("correct_streak", 0)
             next_r = item.get("next_review") or "从未复习"
+            item = enrich_item(item)
+            risk = item.get("forgetting_risk", 0)
+            mastery = item.get("mastery_probability", 0)
+            priority = item.get("review_priority", 0)
             streak_color = RED if streak == 0 else YELLOW
             print(f"    {i+1}. {name}")
-            print(f"       {DIM}正确连击 {streak_color}{streak}{DIM} · 下次复习 {next_r}{NC}")
+            print(f"       {DIM}正确连击 {streak_color}{streak}{DIM} · 下次复习 {next_r} · 掌握 {mastery:.0%} · 遗忘风险 {risk:.0%} · 优先级 {priority:.0%}{NC}")
 
     # 薄弱项
     weak = find_weakest(items)
@@ -190,8 +191,11 @@ def print_review_section(label, items, get_name_fn):
             name = get_name_fn(item)
             streak = item.get("correct_streak", 0)
             reviews = item.get("review_count", 0)
+            item = enrich_item(item)
+            mastery = item.get("mastery_probability", 0)
+            priority = item.get("review_priority", 0)
             print(f"    {i+1}. {name}")
-            print(f"       {DIM}正确 {RED}{streak}{DIM} 次 · 复习 {reviews} 次{NC}")
+            print(f"       {DIM}正确 {RED}{streak}{DIM} 次 · 复习 {reviews} 次 · 掌握 {mastery:.0%} · 优先级 {priority:.0%}{NC}")
 
 
 def get_word_name(item):

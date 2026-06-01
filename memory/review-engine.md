@@ -63,6 +63,28 @@ description: 所有内容记忆型 Skill 共享的间隔复习引擎规则。
 
 连续正确 5 次（`correct_streak >= 5`）→ 标记为 `mastered: true`，不再主动推送复习。但保留在数据中，用户可以请求"复习全部"时包含。
 
+## SM-2 风格调度升级
+
+Learning Agent Framework 提供 `learning_agent.memory.scheduler` 作为新的调度 baseline。它兼容现有字段，同时增加：
+
+- `ease_factor`：题目的难度因子，答得越稳增长越快，答错会下降。
+- `mastery_probability`：当前掌握概率估计。
+- `forgetting_risk`：当前遗忘风险估计。
+- `review_priority`：复习优先级，用于排序到期和薄弱项目。
+
+复习质量使用 SM-2 语义：
+
+| quality | 含义 |
+|---------|------|
+| 0-2 | 回忆失败，重置间隔 |
+| 3-5 | 回忆成功，按质量调整间隔和 ease factor |
+
+命令行示例：
+
+```bash
+python -m learning_agent.memory.scheduler '{"id":"limit","correct_streak":2,"interval_days":6}' --quality 5 --json
+```
+
 ## 复习报告
 
 每次复习结束后展示：

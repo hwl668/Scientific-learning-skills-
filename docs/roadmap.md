@@ -12,8 +12,22 @@
 - [x] 学科扩展方案（`docs/subject-expansion-plan.md`）
 - [ ] `plugin.json` 插件清单（draft 在 `docs/plugin-manifest-draft.json`，待规范稳定后启用）
 
+## v0.2: Learning Agent Framework Prototype
+
+- [x] Skill Router + `data/routing_cases.jsonl`
+- [x] Cognitive Diagnosis Engine + `data/diagnosis_cases.jsonl`
+- [x] SM-2 style Memory Scheduler
+- [x] Eval Runner split into `learning_agent/eval/`
+- [x] Prompt Compiler for multi-platform system prompts
+- [x] Subject Case Library + `data/subject_cases.jsonl`
+- [x] v0.2 summary doc: `docs/v0.2-summary.md`
+
 ## M2: 信任与传播
 
+- [ ] v0.1 vs v0.2 对比报告
+- [ ] 真实学习 traces 记录与反馈闭环
+- [ ] Subject case coverage metrics
+- [ ] Eval regression gate（pass-rate / score threshold）
 - [ ] evals 扩充：接入真实 model-as-judge 打分（LLM 评分）
 - [ ] 中英双语完整测试集
 - [ ] 3 个 killer case 博客文章（矩阵/极限/英语词汇）

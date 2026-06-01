@@ -1,0 +1,66 @@
+{"text":"我第一次学傅里叶变换，它到底是在研究什么？","skill":"zero-base-learning","category":"zero"}
+{"text":"什么是导数？我完全不懂。","skill":"zero-base-learning","category":"zero"}
+{"text":"矩阵到底是什么？为什么不只是数字表？","skill":"zero-base-learning","category":"zero"}
+{"text":"从零讲一下 Dijkstra 是在解决什么问题。","skill":"zero-base-learning","category":"zero"}
+{"text":"极限是什么？我第一次接触。","skill":"zero-base-learning","category":"zero"}
+{"text":"向量空间是什么？入门怎么理解？","skill":"zero-base-learning","category":"zero"}
+{"text":"Cache 是什么？为什么程序会有命中和未命中？","skill":"zero-base-learning","category":"zero"}
+{"text":"请介绍一下泰勒公式到底有什么用。","skill":"zero-base-learning","category":"zero"}
+{"text":"我会算矩阵乘法，但不知道矩阵到底表示什么。","skill":"fuzzy-understanding","category":"fuzzy"}
+{"text":"我学过 ε-N 定义，但一看量词顺序就懵。","skill":"fuzzy-understanding","category":"fuzzy"}
+{"text":"GIPS 和 CPI 我老分不清，什么时候用哪个？","skill":"fuzzy-understanding","category":"fuzzy"}
+{"text":"我会套泰勒展开公式，但不知道为什么可以这样近似。","skill":"fuzzy-understanding","category":"fuzzy"}
+{"text":"KMP 的 next 数组我会背模板，但看不懂它在表示什么。","skill":"fuzzy-understanding","category":"fuzzy"}
+{"text":"核空间和像空间我听过，但总是不会用。","skill":"fuzzy-understanding","category":"fuzzy"}
+{"text":"我会求导，但不理解导数在建模里到底在干什么。","skill":"fuzzy-understanding","category":"fuzzy"}
+{"text":"为什么 A²=0 可以推出 Im(A) ⊆ Ker(A)？我看不懂这个符号关系。","skill":"fuzzy-understanding","category":"fuzzy"}
+{"text":"讲透微积分基本定理的本质，不要只告诉我公式。","skill":"deepening-learning","category":"deep"}
+{"text":"泰勒公式中的余项到底控制了什么？想更深入理解。","skill":"deepening-learning","category":"deep"}
+{"text":"极限、连续、导数、积分之间的逻辑联系是什么？","skill":"deepening-learning","category":"deep"}
+{"text":"从多角度解释一下特征值为什么能反映线性变换的本质。","skill":"deepening-learning","category":"deep"}
+{"text":"为什么傅里叶思想可以用于信号、图像和神经网络？","skill":"deepening-learning","category":"deep"}
+{"text":"秩-零化度定理为什么重要？能不能讲证明思路和反例意识。","skill":"deepening-learning","category":"deep"}
+{"text":"怎么把线代从计算题学成结构理解？","skill":"deepening-learning","category":"deep"}
+{"text":"Dijkstra、Bellman-Ford、Floyd 的适用场景有什么本质区别？","skill":"deepening-learning","category":"deep"}
+{"text":"这题怎么做：求 lim(x→0)(e^x - 1 - x)/x²。","skill":"problem-solving","category":"problem"}
+{"text":"证明 sqrt(2) 是无理数，这道题我卡住了。","skill":"problem-solving","category":"problem"}
+{"text":"有一道图论题不会做，怎么判断该用 DFS 还是 BFS？","skill":"problem-solving","category":"problem"}
+{"text":"求解这个线性方程组，我不知道第一步该怎么做。","skill":"problem-solving","category":"problem"}
+{"text":"这道算法题看起来能贪心，但我做不出来。","skill":"problem-solving","category":"problem"}
+{"text":"帮我看看这题的解题思路，不要直接给答案。","skill":"problem-solving","category":"problem"}
+{"text":"极限题卡住了，sin x - x 除以 x³ 应该怎么分析？","skill":"problem-solving","category":"problem"}
+{"text":"这道证明题题目是 Im(A) ⊆ Ker(A)，我不知道怎么下手。","skill":"problem-solving","category":"problem"}
+{"text":"这题我做错了：ln(x²-1) 的定义域，我写 x>1，标准答案是 x<-1 或 x>1。","skill":"mistake-review","category":"mistake"}
+{"text":"我答案和正确答案不一样，但我不知道错在哪。","skill":"mistake-review","category":"mistake"}
+{"text":"这道题总是粗心扣分，帮我复盘错因。","skill":"mistake-review","category":"mistake"}
+{"text":"错题复盘：我把 x²>1 解成了 x>1。","skill":"mistake-review","category":"mistake"}
+{"text":"为什么我这次证明题又错了？标准答案用了反证法。","skill":"mistake-review","category":"mistake"}
+{"text":"同样的定义域问题我反复做错，怎么避免？","skill":"mistake-review","category":"mistake"}
+{"text":"我的错误解答是直接约分，答案说这里不能约，帮我看错因。","skill":"mistake-review","category":"mistake"}
+{"text":"这次考试我在边界情况漏掉了 x=0，怎么复盘？","skill":"mistake-review","category":"mistake"}
+{"text":"!undermine 六级","skill":"word-deep-dive","category":"word"}
+{"text":"complimentary 考研","skill":"word-deep-dive","category":"word"}
+{"text":"查词：meticulous","skill":"word-deep-dive","category":"word"}
+{"text":"undermine 和 underestimate 有什么区别？","skill":"word-deep-dive","category":"word"}
+{"text":"复习单词","skill":"word-deep-dive","category":"word"}
+{"text":"单词记忆状态","skill":"word-deep-dive","category":"word"}
+{"text":"删除单词 complimentary","skill":"word-deep-dive","category":"word"}
+{"text":"resilient","skill":"word-deep-dive","category":"word"}
+{"text":"帮我背这段：实践是检验真理的唯一标准。","skill":"text-memorizer","category":"text"}
+{"text":"抽背","skill":"text-memorizer","category":"text"}
+{"text":"出题","skill":"text-memorizer","category":"text"}
+{"text":"复习薄弱点","skill":"text-memorizer","category":"text"}
+{"text":"帮我记一下近代史这段材料。","skill":"text-memorizer","category":"text"}
+{"text":"默写检测：新民主主义革命的总路线。","skill":"text-memorizer","category":"text"}
+{"text":"全部复习毛概知识点。","skill":"text-memorizer","category":"text"}
+{"text":"关键词触发：直接现实性，帮我抽背。","skill":"text-memorizer","category":"text"}
+{"text":"两个月怎么学完线性代数，每天 1.5 小时，目标期末及格。","skill":"study-plan-builder","category":"plan"}
+{"text":"给我制定一个考研数学复习计划。","skill":"study-plan-builder","category":"plan"}
+{"text":"我想自学 Python，怎么安排路线图？","skill":"study-plan-builder","category":"plan"}
+{"text":"期末前两周怎么备考 CSAPP？","skill":"study-plan-builder","category":"plan"}
+{"text":"每天只有 40 分钟，多久学完概率论？","skill":"study-plan-builder","category":"plan"}
+{"text":"帮我排一个英语六级冲刺复习安排。","skill":"study-plan-builder","category":"plan"}
+{"text":"如何短期补齐线代薄弱点并通过考试？","skill":"study-plan-builder","category":"plan"}
+{"text":"我有三个月准备算法竞赛，学习计划怎么做？","skill":"study-plan-builder","category":"plan"}
+{"text":"/scientific-learning 矩阵乘法是什么？","skill":"scientific-learning","category":"router"}
+{"text":"用 scientific-learning 帮我处理这个学习问题：这题我卡住了。","skill":"scientific-learning","category":"router"}

@@ -156,6 +156,40 @@ zero-base-learning-limit    18/20 PASS
 word-deep-dive-undermine    17/20 PASS  [word rubric]
 ```
 
+## v0.2: Learning Agent Framework
+
+v0.2 将项目从 Skill Pack 升级为可运行的 Learning Agent Framework。Skill 仍然负责教学行为，框架模块负责路由、诊断、记忆调度、评测、部署编译和标准案例管理。
+
+| 模块 | 作用 | 命令 |
+|------|------|------|
+| Skill Router | 将用户学习问题路由到合适的 skill | `python -m learning_agent.router "我会算矩阵乘法，但不知道矩阵到底表示什么"` |
+| Cognitive Diagnosis | 识别 6 类学习卡点 | `python -m learning_agent.diagnosis "矩阵乘法我会算，但不知道为什么要行乘列"` |
+| Memory Scheduler | 用 SM-2 风格算法计算间隔、掌握概率、遗忘风险、复习优先级 | `python -m learning_agent.memory.scheduler '{"id":"limit","correct_streak":2,"interval_days":6}' --quality 5 --json` |
+| Eval Runner | 运行 demo / JSONL suite，输出 text、JSON 或 Markdown 报告 | `python -m learning_agent.eval.runner --suite evals/cases/smoke.jsonl --report markdown` |
+| Prompt Compiler | 按平台、skill 选择和 token budget 生成 system prompt | `python -m learning_agent.compile --target codex --skills fuzzy,problem,word --output prompt.md --metadata` |
+| Subject Case Library | 管理大学专业课、算法、机器学习、系统课、建模和科研竞赛案例 | `python -m learning_agent.subjects --summary` |
+
+核心数据集：
+
+| 数据集 | 用途 |
+|--------|------|
+| `data/routing_cases.jsonl` | Router 标注评估 |
+| `data/diagnosis_cases.jsonl` | 认知卡点诊断评估 |
+| `data/subject_cases.jsonl` | 学科/科研场景覆盖 |
+| `evals/cases/smoke.jsonl` | Eval Runner JSONL smoke suite |
+
+当前回归验证：
+
+```bash
+python -B -m unittest discover -s tests
+python -B -m learning_agent.router --eval
+python -B -m learning_agent.diagnosis --eval
+python -B eval.py --quick
+python -B -m learning_agent.eval.runner --suite evals/cases/smoke.jsonl --report json
+```
+
+更多 v0.2 设计和验证说明见 [`docs/v0.2-summary.md`](./docs/v0.2-summary.md)。
+
 ## 安装到其他平台
 
 Skills 本质是结构化 Markdown 指令集，不依赖特定平台。将 RULES.md + skills/ 合成为系统提示注入即可。
