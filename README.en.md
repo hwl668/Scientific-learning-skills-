@@ -4,6 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Platforms](https://img.shields.io/badge/Platform-Claude%20Code%20|%20Codex%20|%20OpenClaw%20|%20GPTs%20|%20Generic-lightgrey)]()
+[![Try the diagnostic learning Agent on Socialistic](https://socialistic.ai/api/embed/scientific-learning-agent-a8f23b?lang=en)](https://socialistic.ai/en/skill/scientific-learning-agent-a8f23b?utm_source=github&utm_medium=readme&utm_campaign=20260601-gaokao-ai-study-workflows&utm_content=badge)
 
 [中文版](./README.md)
 
