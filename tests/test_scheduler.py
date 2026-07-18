@@ -2,6 +2,7 @@ import unittest
 from datetime import date
 
 from learning_agent.memory.scheduler import (
+    enrich_item,
     forgetting_risk,
     mastery_probability,
     review_priority,
@@ -60,6 +61,13 @@ class SchedulerTest(unittest.TestCase):
         sorted_items = sort_for_review(items, today)
         self.assertEqual(sorted_items[0]["id"], "urgent")
         self.assertIn("review_priority", sorted_items[0])
+
+    def test_extreme_numeric_state_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "correct_streak"):
+            enrich_item({"correct_streak": 10**1000})
+
+        with self.assertRaisesRegex(ValueError, "response_seconds"):
+            schedule_review({}, quality=5, response_seconds=float("inf"))
 
 
 if __name__ == "__main__":

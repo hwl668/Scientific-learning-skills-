@@ -1,74 +1,89 @@
 # Contributing
 
-欢迎贡献新的 Skill、改进现有 Skill、或提交学科案例。
+欢迎贡献新的 Skill、改进现有 Skill，或提交学科案例与失败用例。请区分两类检查：仓库校验器检查 Skill 定义本身；输出评分器检查由 Skill 生成的教学回答。后者不能证明真实学习效果。
 
-## 最容易贡献的 5 件事（5 分钟起）
+## 最容易贡献的 5 件事（2 分钟起）
 
-| 任务 | 说明 | 耗时 |
-|------|------|------|
-| 添加常见误区 | 在任意 SKILL.md 的常见误区表中加一行你踩过的坑 | 2 分钟 |
-| 补充测试用例 | 在 `evals/test_cases.md` 中添加你遇到的真实问题 | 3 分钟 |
-| 报告 bad case | 提 Issue：给出 AI 回复未遵循规范的例子 | 5 分钟 |
-| 提交变式题 | 给任意 Skill 的测试样例增加一个变式题 | 5 分钟 |
-| 翻译 | 将 README 或任意 SKILL.md 中的部分内容译为英文 | 10 分钟 |
+| 任务 | 说明 | 参考耗时 |
+|------|------|----------|
+| 添加常见误区 | 为某个 Skill 补充真实、具体、可纠正的误区 | 2 分钟 |
+| 补充路由或诊断样例 | 在 `data/` 的 JSONL 测试集中添加边界用例 | 3 分钟 |
+| 报告 bad case | 提交可复现的输入、实际输出、期望行为与环境 | 5 分钟 |
+| 提交静态教学样例 | 在 `evals/cases/smoke.jsonl` 中补充人工审阅过的输出 | 10 分钟 |
+| 改进文档或翻译 | 修正不准确的能力声明、命令或中英文内容 | 10 分钟 |
 
 ## 贡献方式
 
-1. **新增 Skill**：运行 `bash skill-creator.sh` 生成骨架，在 `skills/` 下填充 `SKILL.md`。
-2. **改进 Skill**：直接修改对应 `SKILL.md`，确保符合 `evals/scoring_rubric.md` 的标准。
-3. **新增学科案例**：在 `examples/` 下新建文件。
-4. **新增测试用例**：在 `evals/test_cases.md` 中添加测试问题。
+1. **新增 Skill**：运行 `bash skill-creator.sh` 生成骨架，在 `skills/<name>/SKILL.md` 中完成定义。
+2. **改进 Skill**：修改对应 `SKILL.md`，并遵守 `RULES.md` 与 `evals/scoring_rubric.md`。
+3. **新增学科案例**：在 `examples/` 下添加文件，并标明它是说明性案例还是实际测试记录。
+4. **新增评测样例**：静态输出放入 `evals/cases/`；路由、诊断样例放入 `data/` 对应 JSONL 文件。
 
 ## 什么是一个好 Skill
 
-参考 `templates/skill-template.md` 的完整结构。以下是最低要求和加分项：
+参考 `templates/skill-template.md`。最低要求包括：
 
-### 最低要求
+- [ ] 合法且无重复键的 YAML frontmatter，`name` 与目录名一致
+- [ ] 先判断学习者状态，再选择解释深度
+- [ ] 直觉解释先于正式定义
+- [ ] 实质性教学输出包含至少 2 行真实数据的“常见误区”表格
+- [ ] 提供 1–2 道自测题或变式题
+- [ ] 给出反例或适用边界
 
-- [ ] YAML frontmatter（name, description）
-- [ ] 诊断/输入判断环节
-- [ ] 直觉解释（先于正式定义）
-- [ ] 常见误区表格（至少 2 条，P0 强制）
-- [ ] 1-2 道验证题/变式题
-- [ ] 反例约束（"什么时候不要这样做"）
+可选增强项：最小例题、多视角解释、跨知识联系，以及明确的数据保存与清除规则。
 
-### 加分项
+## 两类验收，不要混用
 
-- [ ] 最小例题（数字干净、只涉及当前概念）
-- [ ] 多视角解释（同一个概念从不同角度讲）
-- [ ] 跨知识联系（"这个和你知道的 X 有什么关系"）
-- [ ] Memory 系统定义（存什么、何时读写）
+### 1. Skill 定义校验
 
-### 判断标准
+这一步检查 frontmatter、目录名、字段类型和 P0 结构约束：
 
-用 `eval.py` 自测：`python eval.py --input-file skills/<your-skill>/SKILL.md`
+```bash
+python -B -m learning_agent.validate_skills
+```
 
-合格线：≥ 14 分。
+### 2. 教学输出评分
+
+`eval.py` 的输入应当是某次生成的教学回答，不是 `SKILL.md` 提示词文件：
+
+```bash
+python eval.py --input-file path/to/generated-answer.md --skill fuzzy-understanding
+```
+
+当前门禁要求总分至少 14/20，且“常见误区/关键误区”和“避免空泛”都必须满 2 分。它只表示静态结构规则基本达标，不代表学生真正学会，也不代表线上 A/B 测试结果。需要报告教学有效性时，请提供真实用户、任务、基线、样本量与结果指标。
 
 ## Skill 设计原则
 
-- 一个 Skill 只解决一类问题，不要混。
-- 必须有诊断步骤，不能假设已知学习者状态。
-- 面向高中到本科低年级学生，不过度复杂。
-- 没有空泛鼓励语（"加油""坚持就是胜利"等）。
-- 没有长篇百科式堆砌。
+- 一个 Skill 聚焦一类学习问题；路由层负责分流。
+- 不假设学习者已经掌握前置知识。
+- 面向高中到本科低年级理工科学生，避免循环依赖高阶概念。
+- 不使用空泛鼓励语，也不堆砌百科式内容。
+- 示例、合成数据、静态评分和真实用户证据必须分别标注。
 
 ## 提交前检查
 
 ```bash
-# 1. 验证 frontmatter 和结构
-python eval.py --input-file skills/<name>/SKILL.md
+# 严格校验所有 Skill
+python -B -m learning_agent.validate_skills
 
-# 2. 在 Claude Code 中实际测试
-#    输入测试样例中的问题，确认输出符合预期
+# 完整回归测试
+python -B -m unittest discover -s tests -v
+
+# 路由、诊断与静态教学输出评测
+python -B -m learning_agent.router --eval
+python -B -m learning_agent.diagnosis --eval
+python -B -m learning_agent.eval.runner --suite evals/cases/smoke.jsonl --report json
 ```
+
+提交前还应人工检查新增样例是否泄露个人信息、是否夸大证据，以及失败路径是否给出可行动的错误提示。
 
 ## 目录约定
 
-```
-skills/<skill-name>/SKILL.md    # Skill 定义（规范源）
-memory/<skill-name>/            # 用户学习数据（.gitignore 忽略 JSON）
-demo/                           # 演示 transcript
-evals/                          # 测试集 + 评分标准
-deploy/                         # 各平台部署指南
+```text
+skills/<skill-name>/SKILL.md       # Skill 定义（规范源）
+memory/<skill-name>/               # 本地学习数据；默认不提交
+demo/                              # 人工编写的静态行为示例，不是在线 transcript
+evals/                             # 静态测试集与评分规则
+learning_agent/resources/          # 随安装包发布的数据与安全模型 artifact
+deploy/                            # 各平台部署指南
 ```

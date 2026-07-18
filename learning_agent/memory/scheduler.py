@@ -18,6 +18,36 @@ from datetime import date, timedelta
 DEFAULT_EASE_FACTOR = 2.5
 MIN_EASE_FACTOR = 1.3
 MASTERED_STREAK = 5
+MAX_REVIEW_COUNT = 1_000_000
+MAX_CORRECT_STREAK = 1_000_000
+MAX_INTERVAL_DAYS = 365_000
+MAX_EASE_FACTOR = 100.0
+MAX_RESPONSE_SECONDS = 86_400.0
+
+
+def _bounded_int(item: dict, field: str, default: int, minimum: int, maximum: int) -> int:
+    value = item.get(field, default)
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ValueError(f"{field} must be an integer")
+    if not minimum <= value <= maximum:
+        raise ValueError(f"{field} must be between {minimum} and {maximum}")
+    return value
+
+
+def _bounded_float(
+    item: dict,
+    field: str,
+    default: float,
+    minimum: float,
+    maximum: float,
+) -> float:
+    value = item.get(field, default)
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"{field} must be numeric")
+    value = float(value)
+    if not math.isfinite(value) or not minimum <= value <= maximum:
+        raise ValueError(f"{field} must be finite and between {minimum} and {maximum}")
+    return value
 
 
 @dataclass(frozen=True)
@@ -32,14 +62,29 @@ class MemoryState:
 
     @classmethod
     def from_item(cls, item: dict) -> "MemoryState":
+        if not isinstance(item, dict):
+            raise ValueError("memory item must be an object")
+        mastered = item.get("mastered", False)
+        if not isinstance(mastered, bool):
+            raise ValueError("mastered must be a boolean")
+        correct_streak = _bounded_int(item, "correct_streak", 0, 0, MAX_CORRECT_STREAK)
         return cls(
-            review_count=int(item.get("review_count", 0) or 0),
-            correct_streak=int(item.get("correct_streak", 0) or 0),
-            interval_days=max(1, int(item.get("interval_days", 1) or 1)),
-            ease_factor=max(MIN_EASE_FACTOR, float(item.get("ease_factor", DEFAULT_EASE_FACTOR) or DEFAULT_EASE_FACTOR)),
+            review_count=_bounded_int(item, "review_count", 0, 0, MAX_REVIEW_COUNT),
+            correct_streak=correct_streak,
+            interval_days=_bounded_int(item, "interval_days", 1, 1, MAX_INTERVAL_DAYS),
+            ease_factor=max(
+                MIN_EASE_FACTOR,
+                _bounded_float(
+                    item,
+                    "ease_factor",
+                    DEFAULT_EASE_FACTOR,
+                    0.01,
+                    MAX_EASE_FACTOR,
+                ),
+            ),
             last_reviewed=item.get("last_reviewed"),
             next_review=item.get("next_review"),
-            mastered=bool(item.get("mastered") or int(item.get("correct_streak", 0) or 0) >= MASTERED_STREAK),
+            mastered=mastered or correct_streak >= MASTERED_STREAK,
         )
 
 
@@ -121,23 +166,32 @@ def schedule_review(item: dict, quality: int, today: date | None = None, respons
 
     today = today or date.today()
     state = MemoryState.from_item(item)
+    if isinstance(quality, bool) or not isinstance(quality, int):
+        raise ValueError("quality must be an integer")
     q = max(0, min(5, int(quality)))
     correct = q >= 3
     ease = _updated_ease_factor(state.ease_factor, q)
 
     updated = dict(item)
+    if state.review_count >= MAX_REVIEW_COUNT:
+        raise ValueError(f"review_count cannot exceed {MAX_REVIEW_COUNT}")
     updated["review_count"] = state.review_count + 1
     updated["last_reviewed"] = today.isoformat()
     updated["ease_factor"] = ease
 
     if correct:
+        if state.correct_streak >= MAX_CORRECT_STREAK:
+            raise ValueError(f"correct_streak cannot exceed {MAX_CORRECT_STREAK}")
         streak = state.correct_streak + 1
         if streak == 1:
             interval = 1
         elif streak == 2:
             interval = 6
         else:
-            interval = max(1, int(round(state.interval_days * ease)))
+            interval = min(
+                MAX_INTERVAL_DAYS,
+                max(1, int(round(state.interval_days * ease))),
+            )
         updated["correct_streak"] = streak
         updated["interval_days"] = interval
         updated["mastered"] = streak >= MASTERED_STREAK
@@ -149,7 +203,14 @@ def schedule_review(item: dict, quality: int, today: date | None = None, respons
     updated["next_review"] = (today + timedelta(days=int(updated["interval_days"]))).isoformat()
 
     if response_seconds is not None:
-        updated["last_response_seconds"] = max(0.0, float(response_seconds))
+        if isinstance(response_seconds, bool) or not isinstance(response_seconds, (int, float)):
+            raise ValueError("response_seconds must be numeric")
+        response_seconds = float(response_seconds)
+        if not math.isfinite(response_seconds) or not 0.0 <= response_seconds <= MAX_RESPONSE_SECONDS:
+            raise ValueError(
+                f"response_seconds must be finite and between 0 and {MAX_RESPONSE_SECONDS}"
+            )
+        updated["last_response_seconds"] = response_seconds
 
     updated["forgetting_risk"] = forgetting_risk(updated, today)
     updated["mastery_probability"] = mastery_probability(updated, today)

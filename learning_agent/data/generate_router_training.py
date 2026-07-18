@@ -16,7 +16,14 @@ from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_OUTPUT = PROJECT_ROOT / "data" / "training" / "router_training_v0.3.jsonl"
+DEFAULT_OUTPUT = (
+    PROJECT_ROOT
+    / "learning_agent"
+    / "resources"
+    / "data"
+    / "training"
+    / "router_training_v0.3.jsonl"
+)
 
 
 @dataclass(frozen=True)

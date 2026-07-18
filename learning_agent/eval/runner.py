@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 from .metrics import summarize
-from .scorers import BASELINE_MARKER, extract_scorable, get_rubric, parse_file_meta
+from .scorers import BASELINE_MARKER, canonicalize_rubric, extract_scorable, get_rubric, parse_file_meta
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -22,12 +22,29 @@ DIM = "\033[2m"
 NC = "\033[0m"
 
 
-def evaluate(text: str, label: str = "", rubric: str | None = None, is_baseline: bool | None = None) -> dict:
-    scorable = extract_scorable(text)
+def evaluate(
+    text: str,
+    label: str = "",
+    rubric: str | None = None,
+    is_baseline: bool | None = None,
+    *,
+    allow_inline_baseline: bool = False,
+    allow_stop_marker: bool = False,
+) -> dict:
+    if not isinstance(text, str) or not text.strip():
+        raise ValueError("evaluation text must be a non-empty string")
+    scorable = extract_scorable(text, allow_stop_marker=allow_stop_marker)
     meta = parse_file_meta(text)
-    if rubric:
-        meta["rubric"] = rubric
+    if not allow_inline_baseline:
+        # Untrusted input must not be able to exempt itself from pass/fail gating.
+        meta["is_baseline"] = False
+    if rubric is not None:
+        meta["rubric"] = canonicalize_rubric(rubric)
+    else:
+        meta["rubric"] = canonicalize_rubric(meta["rubric"])
     if is_baseline is not None:
+        if not isinstance(is_baseline, bool):
+            raise ValueError("is_baseline must be a boolean")
         meta["is_baseline"] = is_baseline
 
     scorers, max_score, threshold = get_rubric(meta)
@@ -39,12 +56,21 @@ def evaluate(text: str, label: str = "", rubric: str | None = None, is_baseline:
         scores[name] = (score, note)
         total += score
 
+    misconception_score = next(
+        (score for name, (score, _note) in scores.items() if name in {"常见误区", "关键误区"}),
+        0,
+    )
+    p0_passed = misconception_score == 2
+    style_gate_passed = scores.get("避免空泛", (0, ""))[0] == 2
+
     return {
         "label": label,
         "scores": scores,
         "total": total,
         "max": max_score,
-        "passed": total >= threshold,
+        "passed": total >= threshold and p0_passed and style_gate_passed,
+        "p0_passed": p0_passed,
+        "style_gate_passed": style_gate_passed,
         "rubric": meta["rubric"],
         "is_baseline": meta["is_baseline"],
     }
@@ -82,12 +108,20 @@ def run_demo_eval(skill: str | None = None, quick: bool = False, include_all: bo
     results = []
     for path in files:
         text = path.read_text(encoding="utf-8")
-        results.append(evaluate(text, label=f"demo/{path.relative_to(DEMO_DIR)}"))
+        results.append(
+            evaluate(
+                text,
+                label=f"demo/{path.relative_to(DEMO_DIR)}",
+                allow_inline_baseline=True,
+                allow_stop_marker=True,
+            )
+        )
     return results
 
 
 def load_jsonl_cases(path: Path) -> list[dict]:
     cases = []
+    seen_ids: set[str] = set()
     with path.open(encoding="utf-8") as f:
         for line_no, line in enumerate(f, 1):
             line = line.strip()
@@ -97,8 +131,30 @@ def load_jsonl_cases(path: Path) -> list[dict]:
                 case = json.loads(line)
             except json.JSONDecodeError as exc:
                 raise ValueError(f"{path}:{line_no}: invalid JSON: {exc}") from exc
-            if "text" not in case:
-                raise ValueError(f"{path}:{line_no}: case must contain text")
+            if not isinstance(case, dict):
+                raise ValueError(f"{path}:{line_no}: case must be a JSON object")
+            text = case.get("text")
+            if not isinstance(text, str) or not text.strip():
+                raise ValueError(f"{path}:{line_no}: text must be a non-empty string")
+            if "rubric" in case:
+                try:
+                    case["rubric"] = canonicalize_rubric(case["rubric"])
+                except ValueError as exc:
+                    raise ValueError(f"{path}:{line_no}: {exc}") from exc
+            if "baseline" in case and not isinstance(case["baseline"], bool):
+                raise ValueError(f"{path}:{line_no}: baseline must be a boolean")
+
+            identifier_key = next((key for key in ("id", "label", "name") if key in case), None)
+            if identifier_key is not None:
+                explicit_id = case[identifier_key]
+                if isinstance(explicit_id, bool) or not isinstance(explicit_id, (str, int)):
+                    raise ValueError(f"{path}:{line_no}: case id/label/name must be a string or integer")
+                normalized_id = str(explicit_id).strip()
+                if not normalized_id:
+                    raise ValueError(f"{path}:{line_no}: case id/label/name must not be blank")
+                if normalized_id in seen_ids:
+                    raise ValueError(f"{path}:{line_no}: duplicate case identifier {normalized_id!r}")
+                seen_ids.add(normalized_id)
             cases.append(case)
     return cases
 
@@ -124,6 +180,8 @@ def result_to_jsonable(result: dict) -> dict:
         "total": result["total"],
         "max": result["max"],
         "passed": result["passed"],
+        "p0_passed": result["p0_passed"],
+        "style_gate_passed": result["style_gate_passed"],
         "rubric": result["rubric"],
         "is_baseline": result["is_baseline"],
         "scores": {name: score for name, (score, _note) in result["scores"].items()},
@@ -174,7 +232,7 @@ def print_summary(results: list[dict]) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Scientific Learning Skills — eval")
-    parser.add_argument("--skill", help="只评测指定 skill 的 demo")
+    parser.add_argument("--skill", help="指定 demo 过滤条件，或 input 模式使用的评分 rubric")
     parser.add_argument("--quick", action="store_true", help="只测核心 skill demo（不含 baseline）")
     parser.add_argument("--all", action="store_true", help="测试所有 demo（含 baseline）")
     parser.add_argument("--input-file", help="评测任意文件")
@@ -188,13 +246,19 @@ def main(argv: list[str] | None = None) -> int:
     report_format = "json" if args.json else args.report
 
     if args.input_text:
-        results = [evaluate(args.input_text, label="<stdin>")]
+        results = [evaluate(args.input_text, label="<stdin>", rubric=args.skill)]
     elif args.input_file:
         path = Path(args.input_file)
         if not path.exists():
             print(f"{RED}文件不存在: {path}{NC}", file=sys.stderr)
             return 1
-        results = [evaluate(path.read_text(encoding="utf-8"), label=path.name)]
+        results = [
+            evaluate(
+                path.read_text(encoding="utf-8"),
+                label=path.name,
+                rubric=args.skill,
+            )
+        ]
     elif args.suite:
         path = Path(args.suite)
         if not path.exists():
@@ -218,6 +282,9 @@ def main(argv: list[str] | None = None) -> int:
         print_summary(results)
 
     judged = [result for result in results if not result["is_baseline"]]
+    if not judged:
+        print(f"{RED}没有可计分样例；baseline 不能单独构成通过门禁。{NC}", file=sys.stderr)
+        return 1
     return 0 if all(result["passed"] for result in judged) else 1
 
 
