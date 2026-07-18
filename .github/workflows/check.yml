@@ -1,5 +1,8 @@
 name: Check
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main, master]
@@ -11,76 +14,76 @@ jobs:
     name: Frontmatter & Structure
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Check SKILL.md frontmatter
-        run: |
-          errors=0
-          for skill in skills/*/SKILL.md; do
-            name=$(basename "$(dirname "$skill")")
-            echo "::group::$name"
-
-            # Check YAML frontmatter exists
-            if ! head -1 "$skill" | grep -q '^---$'; then
-              echo "  FAIL: missing YAML frontmatter"
-              errors=$((errors + 1))
-              echo "::endgroup::"
-              continue
-            fi
-
-            # Extract frontmatter (between first two ---)
-            fm=$(sed -n '/^---$/,/^---$/p' "$skill" | sed '1d;$d')
-
-            # Check required fields
-            if ! echo "$fm" | grep -q '^name:'; then
-              echo "  FAIL: missing 'name' field"
-              errors=$((errors + 1))
-            fi
-
-            if ! echo "$fm" | grep -q '^description:'; then
-              echo "  FAIL: missing 'description' field"
-              errors=$((errors + 1))
-            fi
-
-            # Check P0: 常见误区 section
-            if ! grep -q '常见误区\|常见错误\|误区' "$skill"; then
-              echo "  FAIL: missing P0 '常见误区' section"
-              errors=$((errors + 1))
-            fi
-
-            # Check anti-pattern: empty encouragement
-            if grep -qE '(加油|你能行|坚持就是胜利|come on)' "$skill"; then
-              echo "  WARN: contains empty encouragement phrases"
-            fi
-
-            echo "  OK: frontmatter valid, P0 present"
-            echo "::endgroup::"
-          done
-
-          if [ $errors -gt 0 ]; then
-            echo "::error::$errors skill(s) have issues"
-            exit 1
-          fi
-          echo "All $(( $(ls skills/*/SKILL.md | wc -l) )) skills pass checks"
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install validator dependency
+        run: python -m pip install -e ".[validation]"
+      - name: Parse and validate every Skill
+        run: python -B -m learning_agent.validate_skills
 
   eval-quick:
-    name: Eval (quick)
+    name: Python & Eval (${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
-      - name: Run eval
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install project
         run: |
-          python3 eval.py --quick
-          echo "Eval passed"
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[ml,validation]"
+      - name: Run unit tests
+        run: python -B -m unittest discover -s tests -v
+      - name: Run deterministic router and diagnosis evals
+        run: |
+          python -B -m learning_agent.router --eval
+          python -B -m learning_agent.diagnosis --eval
+      - name: Verify checked-in safe model artifact
+        run: |
+          python -B -m learning_agent.ml_router evaluate
+          python -B -m learning_agent.ml_router predict "我会算矩阵乘法，但不知道它表示什么"
+      - name: Run teaching-output evals
+        run: |
+          python -B eval.py --quick
+          python -B -m learning_agent.eval.runner --suite evals/cases/smoke.jsonl --report json
+      - name: Build and smoke-test the wheel
+        run: |
+          python -m pip wheel . --no-deps --wheel-dir dist
+          python -m venv .wheel-venv
+          .wheel-venv/bin/python -m pip install --no-deps --force-reinstall dist/*.whl
+          mkdir -p /tmp/scientific-learning-wheel-smoke
+          cd /tmp/scientific-learning-wheel-smoke
+          "$GITHUB_WORKSPACE/.wheel-venv/bin/python" -B -c "from pathlib import Path; import learning_agent; from learning_agent.ml_router import DEFAULT_ARTIFACT; assert '.wheel-venv' in str(Path(learning_agent.__file__).resolve()); assert DEFAULT_ARTIFACT.is_file(); assert 'site-packages/learning_agent/resources/artifacts' in DEFAULT_ARTIFACT.as_posix()"
+          "$GITHUB_WORKSPACE/.wheel-venv/bin/python" -B -c "from learning_agent.ml_router import route; result = route('我会算矩阵乘法，但不知道它表示什么'); assert result['label'] == 'fuzzy-understanding', result"
+          "$GITHUB_WORKSPACE/.wheel-venv/bin/python" -B -m learning_agent.ml_router predict "我会算矩阵乘法，但不知道它表示什么"
 
   links:
     name: Link Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Check internal links
         run: |
           errors=0
-          for md in README.md DESIGN.md CONTRIBUTING.md; do
+          for md in README.md README.en.md DESIGN.md CONTRIBUTING.md SECURITY.md; do
             echo "::group::$md"
             # Extract markdown links: [text](path)
             links=$(grep -oP '\[.*?\]\(\.\/[^)]+\)' "$md" || true)
@@ -100,7 +103,8 @@ jobs:
           done
 
           if [ $errors -gt 0 ]; then
-            echo "::warning::$errors broken link(s) found"
+            echo "::error::$errors broken link(s) found"
+            exit 1
           else
             echo "All links valid"
           fi

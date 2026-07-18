@@ -1,81 +1,68 @@
-# 部署到 OpenAI Codex / GPT / o1 系列
+# 部署到 OpenAI Codex、API 或 ChatGPT
 
-## 概述
+## 选择加载方式
 
-Codex 和 GPT 系列模型不直接支持 Skill 目录机制，但可以通过**系统消息（System Message）**或**自定义 GPTs** 加载指令集。
+- 当前宿主支持 Agent Skills 发现时，优先按宿主文档加载 `skills/<name>/` 目录。
+- 当前宿主不支持 Skill 目录，或需要调用 OpenAI API/自定义 GPT 时，使用仓库自带的 Prompt Compiler 生成单一指令文件。
 
-## 方式一：合成为单一 System Message
+Skill 是行为指令，不是独立应用。实际遵循效果、文件访问和持久化能力取决于宿主、模型与沙箱权限。
 
-将本项目合成为一个完整的系统消息：
+## 方式一：生成合并指令
+
+在仓库根目录运行：
 
 ```bash
-cd /path/to/scientific-learning-skills
-python3 -c "
-import glob, os
-
-parts = []
-# 加载总规则
-parts.append(open('RULES.md').read())
-
-# 加载所有 Skill
-for f in sorted(glob.glob('skills/*/SKILL.md')):
-    parts.append(open(f).read())
-
-print('\n\n'.join(parts))
-" > codex-system-message.txt
+# 加载全部 9 个 Skill
+python -B -m learning_agent.compile --target codex --skills all --output codex-system-message.md --metadata
 ```
 
-在 API 调用中：
+`codex-system-message.md` 会包含 `RULES.md`、选中的 `SKILL.md` 和记忆策略说明。`--metadata` 输出选中 Skill 和启发式 token 估算；实际 token 数以目标模型 tokenizer 为准。
+
+上下文受限时，只编译需要的子 Skill：
+
+```bash
+python -B -m learning_agent.compile --target codex --skills fuzzy,problem,mistake --output codex-system-message.md --no-memory --metadata
+```
+
+`scientific-learning` 是兜底路由入口，只适合用户显式调用统一入口或意图真正模糊的场景。已能明确匹配的请求应直接加载/使用对应子 Skill。
+
+## 方式二：在 OpenAI API 中使用
+
+先安装 OpenAI Python SDK，并在环境变量中配置 `OPENAI_API_KEY` 和项目有权限使用的 `OPENAI_MODEL`。不要将 API key 写入仓库。
 
 ```python
+import os
+from pathlib import Path
+
 from openai import OpenAI
 
-with open("codex-system-message.txt") as f:
-    system_message = f.read()
+instructions = Path("codex-system-message.md").read_text(encoding="utf-8")
 
 client = OpenAI()
 response = client.responses.create(
-    model="gpt-5",
-    instructions=system_message,
-    input="什么是极限？我第一次接触。"
+    model=os.environ["OPENAI_MODEL"],
+    instructions=instructions,
+    input="什么是极限？我第一次接触。",
 )
+print(response.output_text)
 ```
 
-## 方式二：自定义 GPT
+API 调用方负责保存会话状态、学习记录和复习日期；只把 Skill 编译进 `instructions` 不会自动提供持久化。
 
-1. 打开 ChatGPT → 探索 GPTs → 创建
-2. 在"Instructions"中粘贴 `RULES.md` 的内容
-3. 上传 `skills/` 下的 SKILL.md 文件作为知识库附件
-4. 或者在 Instructions 中追加所有 Skill 内容
+## 方式三：自定义 GPT
 
-## 方式三：只加载需要的 Skill
+1. 用 `--target chatgpt` 和实际需要的 `--skills` 生成指令。
+2. 将生成文件中的指令粘贴到自定义 GPT 的 Instructions，并确认没有超出当前产品限制。
+3. 如果需要跨会话记忆，通过可用的工具/API 连接外部存储。
 
-对于 token 敏感的场景，按需加载：
+不要假设把 `SKILL.md` 仅作为知识库附件上传就等同于加载了行为指令。
 
-```bash
-# 只加载总入口，显式调用 scientific-learning 时由它做简版路由
-cat RULES.md > router-system.txt
-cat skills/scientific-learning/SKILL.md >> router-system.txt
+## 验证边界
 
-# 或加载总入口 + 高频子 skill
-cat RULES.md > custom-system.txt
-cat skills/scientific-learning/SKILL.md >> custom-system.txt
-cat skills/fuzzy-understanding/SKILL.md >> custom-system.txt
-cat skills/problem-solving/SKILL.md >> custom-system.txt
+可用下列请求做手工 smoke check：
+
+```text
+我会算极限，但不理解 ε-N 定义到底在干什么。
 ```
 
-## 注意事项
-
-- **Token 预算**：全部 9 个 Skill（1 个总入口 + 8 个子 skill）合成后约 20K-30K tokens。如果模型上下文窗口较小，建议只加载总入口，或加载总入口 + 2-3 个高频子 skill。
-- **o1/o3 系列**：这些模型的系统消息会被转为用户消息。确认规则内容以用户消息形式传入也能被遵循。
-- **Memory**：GPT 模型无原生文件系统。Memory 功能（间隔复习、薄弱点追踪）需要外部存储支持（如通过 Function Calling 访问数据库或文件 API）。
-
-## 验证
-
-使用 API 或 ChatGPT 界面发送：
-
-```
-> 我会算极限，但不理解 ε-N 定义到底在干什么。
-```
-
-应返回诊断型回复（明确指出卡点类型），而非单纯重复 ε-N 定义。
+预期回复先校准具体卡点，而不是只重复定义。这个手工检查只能验证单次行为，不能证明对新请求的稳定遵循率或真实学习效果。

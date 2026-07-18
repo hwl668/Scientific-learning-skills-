@@ -1,10 +1,10 @@
 import json
 import unittest
 from collections import Counter
-from pathlib import Path
+from learning_agent.ml_router import DEFAULT_DATASET
 
 
-TRAINING_PATH = Path("data/training/router_training_v0.3.jsonl")
+TRAINING_PATH = DEFAULT_DATASET
 
 EXPECTED_LABELS = {
     "zero-base-learning",

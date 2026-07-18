@@ -2,6 +2,8 @@
 
 本项目所依据的学习科学原理。
 
+> **适用边界**：下列研究用于解释设计选择，并不构成 Scientific Learning Skills 的效果证明。把研究中的教学条件映射为 Skill 指令只是待验证假设；本项目尚未提供真实学习者的受控实验、迁移测验或延迟复测。
+
 ## 核心理念来源
 
 ### 认知负荷理论 (Cognitive Load Theory)
@@ -9,7 +11,7 @@
 学习者的工作记忆容量有限。当信息呈现方式不当（如符号密集但没有解释、例题缺失直接给抽象定义），认知负荷超载，学习就会失败。
 
 **对应的设计选择**：
-- 直觉先于定义，降低内在认知负荷
+- 直觉先于定义，作为减少不必要表征负担的待验证设计假设
 - 最小例题，降低外在认知负荷
 - 分步推演，避免信息过载
 
@@ -24,7 +26,7 @@
 
 ### 提取练习效应 (Retrieval Practice Effect)
 
-反复阅读不是有效的记忆方式。主动从记忆中提取信息（如自测、填空、给别人讲）能显著增强长期记忆。
+在延迟测验等条件下，主动从记忆中提取信息（如自测、填空）可能比单纯重复阅读更有利于保持；效果会受材料、反馈与测验间隔影响。
 
 **对应的设计选择**：
 - 自测题替代总结
@@ -33,7 +35,7 @@
 
 ### 间隔效应 (Spacing Effect)
 
-分散在时间上的学习比集中突击更有效。
+大量研究显示，分散练习通常比集中练习更有利于延迟保持，但最合适的间隔取决于目标保持时长和任务。
 
 **对应的设计选择**：
 - 背诵 Skill 中的间隔复习提醒
@@ -41,7 +43,7 @@
 
 ### 变式理论 (Variation Theory)
 
-只有当学习者体验到某个概念在不同情境下的表现（包括反例），才能真正理解这个概念的边界和核心特征。
+在不同情境、条件和反例之间比较，有助于学习者区分概念的核心特征与表面特征；本项目把它实现为变式与反例提示。
 
 **对应的设计选择**：
 - 每个 Skill 强制要求变式训练
@@ -88,4 +90,11 @@ zero-base   fuzzy-      问题-      变式        deepening
 
 ### vs. Bloom 二西格玛问题 (2 Sigma Problem)
 
-Bloom 发现一对一辅导比班级教学提升约 2 个标准差。AI 辅助学习的潜力在于提供等同于一对一辅导的诊断和反馈。但前提是 Skill 设计得当——不是简单的问答，而是有结构的教学对话。
+Bloom 报告的是特定条件下的人类一对一辅导与掌握学习结果，不能直接外推为 AI 或本项目能达到同等效果。本项目只借鉴其中的频繁诊断、反馈与掌握检查思路；是否产生学习增益仍需单独实验。
+
+## 代表性来源
+
+- John Sweller (1988), [Cognitive Load During Problem Solving: Effects on Learning](https://doi.org/10.1207/s15516709cog1202_4)
+- Henry L. Roediger III & Jeffrey D. Karpicke (2006), [Test-Enhanced Learning: Taking Memory Tests Improves Long-Term Retention](https://doi.org/10.1111/j.1467-9280.2006.01693.x)
+- Nicholas J. Cepeda et al. (2006), [Distributed Practice in Verbal Recall Tasks: A Review and Quantitative Synthesis](https://doi.org/10.1037/0033-2909.132.3.354)
+- Benjamin S. Bloom (1984), [The 2 Sigma Problem](https://doi.org/10.3102/0013189X013006004)

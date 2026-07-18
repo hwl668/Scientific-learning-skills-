@@ -2,10 +2,10 @@
 
 ## M1: Demo & Eval（当前冲刺）
 
-- [x] `setup.sh` 一键安装
+- [x] `setup.sh` 为 Claude Code 创建 Skill 链接并初始化本地 memory
 - [x] `review.py` 复习进度面板
 - [x] `eval.py` 规则检测评测脚本
-- [x] `demo/` 真实对话 transcript（3 个核心场景）
+- [x] `demo/` 仓库维护者编写的静态行为示例（非真实用户 transcript）
 - [x] GitHub Actions CI（frontmatter + P0 + eval-quick + links）
 - [x] `README.en.md` 英文版
 - [x] `CONTRIBUTING.md` 贡献指南完善
@@ -27,7 +27,7 @@
 - [ ] v0.1 vs v0.2 对比报告
 - [ ] 真实学习 traces 记录与反馈闭环
 - [ ] Subject case coverage metrics
-- [ ] Eval regression gate（pass-rate / score threshold）
+- [x] Eval regression gate（8 个子 Skill 静态结构 smoke + CI 阈值）
 - [ ] evals 扩充：接入真实 model-as-judge 打分（LLM 评分）
 - [ ] 中英双语完整测试集
 - [ ] 3 个 killer case 博客文章（矩阵/极限/英语词汇）

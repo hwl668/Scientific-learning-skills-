@@ -1,15 +1,17 @@
 # Scientific Learning Skills
 
-> Turns AI from answer machine into diagnostic tutor. Student-facing Agent Skills — diagnosis before explanation.
+> A student-facing Agent Skills prototype for diagnosis-before-explanation tutoring.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-[![Platforms](https://img.shields.io/badge/Platform-Claude%20Code%20|%20Codex%20|%20OpenClaw%20|%20GPTs%20|%20Generic-lightgrey)]()
+![Platforms](https://img.shields.io/badge/Platform-Claude%20Code%20|%20Codex%20|%20OpenClaw%20|%20GPTs%20|%20Generic-lightgrey)
 
 [中文版](./README.md)
 
 ---
 
 ## What It Does
+
+> The outputs below are repository-authored behavior examples. They illustrate the intended interaction pattern; they are not controlled comparisons, live model transcripts, or evidence from real learners.
 
 **Look up a word — get more than a translation:**
 
@@ -41,9 +43,9 @@ Verify: what does [0,-1; 1,0] do to a square?
 Variation: swap to [1,1; 0,1], predict the effect.
 ```
 
-**9 Skills covering the full learning loop:**
+**9 Skills covering nine common learning workflows:**
 
-| You're thinking | Auto-triggers |
+| You're thinking | Typical match |
 |----------------|---------------|
 | "I want one big learning entry" | `scientific-learning` — routes first, then applies the right mode |
 | "Never learned this" | `zero-base-learning` — intuition first |
@@ -57,9 +59,9 @@ Variation: swap to [1,1; 0,1], predict the effect.
 
 ---
 
-## With vs Without
+## Design Comparison Example
 
-Same question, different responses:
+The table compares two repository-authored examples to show the design intent behind "diagnose before explaining." It is not an on-the-fly A/B test using the same model and settings.
 
 **User**: I can multiply matrices but don't understand what they represent.
 
@@ -85,18 +87,22 @@ Same question, different responses:
 </td></tr>
 </table>
 
-**Core difference**: bare AI assumes you need everything — and gives you 80% you don't need. Skills diagnose first, then deliver only what you're missing.
+**Design goal**: identify the learner's specific bottleneck before explaining, then reduce information unrelated to that bottleneck.
+
+The checked-in baseline and Skill examples can be scored with `python -B eval.py --all`. This is a heuristic structural check for observable elements such as diagnostic questions, variations, and misconception tables. It does not generate a fresh model response or measure learning outcomes.
 
 ---
 
 ## Quick Start
 
 ```bash
-git clone https://github.com/hwl668/Scientific-learning-skills-.git
+git clone https://github.com/hwl668/Scientific-learning-skills-.git scientific-learning-skills
 cd scientific-learning-skills
-./setup.sh    # auto-detect AI tools + symlinks + init memory
+bash setup.sh # auto-detect AI tools + symlinks + init memory
 claude        # start Claude Code; Skills auto-load
 ```
+
+`setup.sh` supports Linux, macOS, and WSL when the repository is cloned inside the WSL Linux filesystem. Git for Windows may materialize repository symlinks as ordinary files when `core.symlinks=false`, so the Git Bash installation path is not currently supported. The script creates `.claude/skills/` links for a detected Claude Code installation and initializes local `memory/` directories. It only detects the Codex CLI; it does not install these Skills into Codex. See [`deploy/codex.md`](./deploy/codex.md).
 
 Then ask naturally:
 
@@ -106,7 +112,7 @@ Then ask naturally:
 > !undermine CET-6
 ```
 
-Want to inspect the behavior first? Browse [`demo/`](./demo/) for complete transcripts.
+Want to inspect the intended behavior first? Browse [`demo/`](./demo/) for repository-authored static examples.
 
 Want a local smoke check? Run:
 
@@ -114,19 +120,17 @@ Want a local smoke check? Run:
 python eval.py --quick
 ```
 
-Expected core results:
+This checks checked-in text with heuristic rules; it does not call a model or generate new answers. The JSONL structural smoke suite is available separately:
 
-```text
-fuzzy-understanding-matrix  17/20 PASS
-zero-base-learning-limit    18/20 PASS
-word-deep-dive-undermine    17/20 PASS  [word rubric]
+```bash
+python -B -m learning_agent.eval.runner --suite evals/cases/smoke.jsonl --report markdown
 ```
 
-## v0.2 / v0.3: Learning Agent Framework
+## v0.2 / v0.3: Experimental Learning Agent Modules
 
-v0.2 upgrades the project from a Skill Pack into a runnable Learning Agent Framework. Skills still define tutoring behavior; framework modules handle routing, cognitive diagnosis, memory scheduling, evaluation, prompt compilation, and subject cases.
+The project currently combines a **Skill Pack with independently runnable experimental CLI modules**. Skills define tutoring behavior; routing, cognitive diagnosis, memory scheduling, evaluation, prompt compilation, and case inspection run as separate components. They are not yet wired into a persistent end-to-end tutoring application.
 
-v0.3 adds a learned router baseline trained on synthetic routing data with hard negatives and a `non-learning` class, so platform questions like "what model are you?" or "why did image upload fail?" do not get forced into learning skills.
+v0.3 also includes a learned-router baseline trained on synthetic routing data, with hard negatives, a `non-learning` class, and low-confidence fallback.
 
 | Module | Purpose | Command |
 |--------|---------|---------|
@@ -138,17 +142,33 @@ v0.3 adds a learned router baseline trained on synthetic routing data with hard 
 
 Key datasets:
 
-| Dataset | Purpose |
-|---------|---------|
-| `data/routing_cases.jsonl` | Router eval cases |
-| `data/diagnosis_cases.jsonl` | Cognitive diagnosis eval cases |
-| `data/subject_cases.jsonl` | Subject/scenario coverage |
-| `data/training/router_training_v0.3.jsonl` | Learned router training data |
-| `evals/cases/smoke.jsonl` | Eval Runner smoke suite |
+| File | Provenance and purpose |
+|------|------------------------|
+| `data/routing_cases.jsonl` | Repository-authored labeled regression cases for the rule router; not a sample of real users or an external holdout |
+| `data/diagnosis_cases.jsonl` | Repository-authored labeled diagnosis regression cases; not a sample of real users or an external holdout |
+| `data/subject_cases.jsonl` | A catalog for subject/scenario coverage, not learning-outcome data |
+| `learning_agent/resources/data/training/router_training_v0.3.jsonl` | Programmatically generated synthetic/silver router training data with hard negatives and `non-learning`; not independent test evidence |
+| `evals/cases/smoke.jsonl` | Eight hand-authored child-Skill static-output structural smoke cases; no model is called, and routing accuracy or subject correctness is not tested |
+
+## Evidence Boundaries and Local Verification
+
+| Validation layer | What it supports | What it does not support |
+|------------------|------------------|--------------------------|
+| `demo/` + `eval.py` | Whether checked-in examples contain selected tutoring structures | Reliable Skill following on unseen prompts |
+| Router/diagnosis regression cases | Whether current rules regress on in-repo labeled cases | Generalization to new users, phrasing, or subjects |
+| Learned-router grouped-where-possible synthetic holdout (with disclosed fallback) | A synthetic-data baseline and pipeline health check | Accuracy on real traffic or tutoring effectiveness |
+| Real-user study | **Not provided yet** | Learning gains, transfer, or long-term retention |
+
+Read learned-router metrics together with the dataset fingerprint and split strategy. A high synthetic-holdout score must not be described as "100% real-world accuracy" or evidence of improved learning outcomes.
+
+See [`artifacts/README.md`](./artifacts/README.md) for the safe format, hashes, split limitations, and intended-use boundary.
 
 Regression checks:
 
 ```bash
+# Full regression checks need the optional ML and Skill-validation dependencies.
+python -m pip install -e ".[ml,validation]"
+
 python -B -m unittest discover -s tests
 python -B -m learning_agent.router --eval
 python -B -m learning_agent.diagnosis --eval
@@ -158,17 +178,17 @@ python -B eval.py --quick
 
 ## Install On Other Platforms
 
-Skills are platform-agnostic Markdown instruction sets. Combine `RULES.md` + `skills/` into a system prompt, or see [deploy/](./deploy/) for platform-specific notes.
+Skills are structured Markdown instruction sets. A host with Agent Skills support can load Skill directories; other platforms can use the Prompt Compiler. Actual adherence depends on the host, model, and tool permissions.
 
 | Platform | Loading method | Notes |
 |----------|----------------|-------|
 | Claude Code | `.claude/skills/` auto-load | [Guide](./deploy/claude-code.md) |
-| OpenAI Codex / GPTs | merged system instructions | [Guide](./deploy/codex.md) |
+| OpenAI Codex / API / GPTs | native Skills where supported, or compiled instructions | [Guide](./deploy/codex.md) |
 | OpenClaw / OI | Skills directory or system prompt | [Guide](./deploy/openclaw.md) |
 | Cursor / Cline / Copilot | rules file or custom instructions | [Guide](./deploy/generic.md) |
 | Any agent | system prompt injection | [Guide](./deploy/generic.md) |
 
-Token budget: all 9 Skills are about 20K-30K tokens. Load only the router or 2-3 focused Skills when context is tight.
+Token use depends on the selected Skills. Run `python -B -m learning_agent.compile --target generic --skills all --metadata` for this revision's heuristic estimate; the target model's tokenizer is authoritative.
 
 ### Memory Support
 
@@ -176,19 +196,20 @@ Memory powers spaced review and weak-spot tracking. Support depends on whether t
 
 | Platform | Memory support | Notes |
 |----------|----------------|-------|
-| Claude Code | Full | Native filesystem access |
+| Claude Code | Permission-dependent | File memory works when the workspace is writable |
 | Cursor / Cline | Limited | Usually project-directory writes only |
 | OpenClaw | Runtime-dependent | Check filesystem permissions |
-| ChatGPT / GPTs | None | Needs external storage via function calling |
-| Codex / API | None | Needs external storage API |
+| Codex (local workspace) | Sandbox-dependent | `memory/` must be inside a writable root |
+| ChatGPT / GPTs | External storage required | Connect persistence through a tool or API |
+| OpenAI API | External storage required | The caller owns session state and persistence |
 
-Platforms without Memory still support diagnosis, explanations, problem solving, and mistake review.
+This repository does not provide a hosted user-memory service. Without writable storage, single-turn tutoring instructions can still be loaded, but review state will not persist across sessions.
 
 ---
 
 ## Usage
 
-No need to select skills manually — describe your problem naturally:
+When child Skills are loaded and the host supports Skill discovery/matching, describe the problem naturally. The host implementation still determines the final match:
 
 ```text
 > What's a derivative? First time learning.
@@ -200,7 +221,7 @@ No need to select skills manually — describe your problem naturally:
 > Two months to self-study linear algebra, 1.5 hrs/day.
 ```
 
-**Memory & tools:**
+**Memory & tools (when the relevant content-memory Skill is loaded and `memory/` is writable):**
 
 ```text
 > review words        # spaced repetition review
@@ -218,6 +239,8 @@ bash skill-creator.sh     # interactive new skill scaffold
 ## Learn More
 
 - Design philosophy, cognitive science basis, architecture → [DESIGN.md](./DESIGN.md)
+- Router model card and safe-artifact notes → [artifacts/README.md](./artifacts/README.md)
+- Private vulnerability reporting and data boundaries → [SECURITY.md](./SECURITY.md)
 - Contribute → [CONTRIBUTING.md](./CONTRIBUTING.md)
 - Roadmap → [docs/roadmap.md](./docs/roadmap.md)
 

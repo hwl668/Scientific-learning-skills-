@@ -16,8 +16,30 @@ Thumbs.db
 *.tmp
 *.log
 
+# Python build/test artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+build/
+dist/
+.wheel-venv/
+.wheel-smoke/
+.codex-tmp/
+
+# Executable / version-brittle model serialization
+artifacts/*.pkl
+artifacts/*.pickle
+artifacts/*.joblib
+learning_agent/resources/artifacts/*.pkl
+learning_agent/resources/artifacts/*.pickle
+learning_agent/resources/artifacts/*.joblib
+artifacts/generated/
+
 # User memory data (privacy — do not commit personal learning data)
 memory/*/*.json
 memory/*/*.csv
 memory/*/*.md
+memory/*/*.bak
 !memory/review-engine.md

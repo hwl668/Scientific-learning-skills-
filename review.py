@@ -6,16 +6,19 @@
 只依赖 Python 标准库。
 """
 
-import json
-import os
-from datetime import date, datetime
+import math
+from datetime import date
 from pathlib import Path
-from collections import defaultdict
 
 from learning_agent.memory.scheduler import (
+    MAX_CORRECT_STREAK,
+    MAX_EASE_FACTOR,
+    MAX_INTERVAL_DAYS,
+    MAX_REVIEW_COUNT,
     enrich_item,
     sort_for_review,
 )
+from learning_agent.memory.store import MemoryStoreError, read_json
 
 # ── 终端颜色 ──────────────────────────────────────────────
 RED = "\033[0;31m"
@@ -29,30 +32,78 @@ NC = "\033[0m"
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 MEMORY_ROOT = PROJECT_ROOT / "memory"
+MAX_TEXT_FIELD_CHARS = 100_000
 
-# ── 数据读取 ──────────────────────────────────────────────
 
-def read_json(path: Path):
-    """读取 JSON 文件，不存在则返回 None"""
-    if not path.exists():
-        return None
-    try:
-        with open(path) as f:
-            return json.load(f)
-    except (json.JSONDecodeError, OSError):
-        return None
+def _validate_memory_items(items, path):
+    """Reject type-confused memory records before scheduler arithmetic."""
 
+    for index, item in enumerate(items):
+        location = f"{path} 第 {index + 1} 条"
+        if not isinstance(item, dict):
+            raise MemoryStoreError(f"记忆结构无效：{location} 必须是 JSON 对象")
+        for field in ("review_count", "correct_streak"):
+            value = item.get(field, 0)
+            if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+                raise MemoryStoreError(f"记忆结构无效：{location} 的 {field} 必须是非负整数")
+            limit = MAX_REVIEW_COUNT if field == "review_count" else MAX_CORRECT_STREAK
+            if value > limit:
+                raise MemoryStoreError(f"记忆结构无效：{location} 的 {field} 超过上限 {limit}")
+        if "interval_days" in item:
+            value = item["interval_days"]
+            if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+                raise MemoryStoreError(f"记忆结构无效：{location} 的 interval_days 必须是正整数")
+            if value > MAX_INTERVAL_DAYS:
+                raise MemoryStoreError(
+                    f"记忆结构无效：{location} 的 interval_days 超过上限 {MAX_INTERVAL_DAYS}"
+                )
+        if "ease_factor" in item:
+            value = item["ease_factor"]
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(float(value))
+                or value <= 0
+                or value > MAX_EASE_FACTOR
+            ):
+                raise MemoryStoreError(f"记忆结构无效：{location} 的 ease_factor 必须是有限正数")
+        if "mastered" in item and not isinstance(item["mastered"], bool):
+            raise MemoryStoreError(f"记忆结构无效：{location} 的 mastered 必须是布尔值")
+        for field in ("created_at", "last_reviewed", "next_review"):
+            value = item.get(field)
+            if value is None:
+                continue
+            if not isinstance(value, str):
+                raise MemoryStoreError(f"记忆结构无效：{location} 的 {field} 必须是日期字符串或 null")
+            try:
+                date.fromisoformat(value)
+            except ValueError as exc:
+                raise MemoryStoreError(
+                    f"记忆结构无效：{location} 的 {field} 必须是 YYYY-MM-DD"
+                ) from exc
+        for field in ("id", "word", "content", "title", "question"):
+            if field in item and not isinstance(item[field], str):
+                raise MemoryStoreError(f"记忆结构无效：{location} 的 {field} 必须是字符串")
+            if field in item and len(item[field]) > MAX_TEXT_FIELD_CHARS:
+                raise MemoryStoreError(
+                    f"记忆结构无效：{location} 的 {field} 超过 {MAX_TEXT_FIELD_CHARS} 字符"
+                )
+    return items
 
 def load_words():
     """加载单词记忆数据"""
     path = MEMORY_ROOT / "word-deep-dive" / "words.json"
     data = read_json(path)
-    if not data:
+    if data is None:
         return []
     # 兼容两种结构：{"words": [...]} 或 [...]
     if isinstance(data, dict):
-        return data.get("words", [])
-    return data if isinstance(data, list) else []
+        if "words" not in data or not isinstance(data["words"], list):
+            raise MemoryStoreError(f"单词记忆结构无效：{path}（需要列表或含 words 列表的对象）")
+        data = data["words"]
+    if not isinstance(data, list):
+        raise MemoryStoreError(f"单词记忆结构无效：{path}（需要记录列表）")
+    return _validate_memory_items(data, path)
 
 
 def load_text_memory():
@@ -60,11 +111,17 @@ def load_text_memory():
     items = []
     base = MEMORY_ROOT / "text-memorizer"
     for fname in ("questions.json", "weak_points.json"):
-        data = read_json(base / fname)
-        if data and isinstance(data, list):
-            items.extend(data)
-        elif data and isinstance(data, dict):
-            items.extend(data.values())
+        path = base / fname
+        data = read_json(path)
+        if data is None:
+            continue
+        if isinstance(data, list):
+            values = data
+        elif isinstance(data, dict):
+            values = list(data.values())
+        else:
+            raise MemoryStoreError(f"文本记忆结构无效：{path}（需要列表或对象）")
+        items.extend(_validate_memory_items(values, path))
     return items
 
 
@@ -255,28 +312,34 @@ def print_summary(all_items):
 def main():
     print_header("📊 学习复习状态面板")
 
-    # 1. 单词记忆
-    words = load_words()
-    print_review_section("📝 单词记忆 (word-deep-dive)", words, get_word_name)
+    try:
+        # 1. 单词记忆
+        words = load_words()
+        print_review_section("📝 单词记忆 (word-deep-dive)", words, get_word_name)
 
-    # 2. 文本记忆
-    texts = load_text_memory()
-    print_review_section("📄 文本记忆 (text-memorizer)", texts, get_text_name)
+        # 2. 文本记忆
+        texts = load_text_memory()
+        print_review_section("📄 文本记忆 (text-memorizer)", texts, get_text_name)
 
-    # 3. 分析记忆概况
-    analytical_stats = load_analytical_memory()
-    print_analytical_section(analytical_stats)
+        # 3. 分析记忆概况
+        analytical_stats = load_analytical_memory()
+        print_analytical_section(analytical_stats)
 
-    # 4. 跨 Skill 汇总
-    all_items = words + texts
-    print_summary(all_items)
+        # 4. 跨 Skill 汇总
+        all_items = words + texts
+        print_summary(all_items)
+    except MemoryStoreError as exc:
+        print(f"  {RED}[ERR]{NC} {exc}")
+        print(f"  {YELLOW}未继续读取，避免把损坏数据误判为空并覆盖。请检查同目录的 .bak 备份。{NC}")
+        return 1
 
     # 5. 提示
     print()
     print(f"  {DIM}在 AI 中说「复习单词」或「出题」→ 开始间隔复习{NC}")
     print(f"  {DIM}说「学习报告」→ 获取跨 Skill 薄弱点汇总{NC}")
     print()
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
