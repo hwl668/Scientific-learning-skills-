@@ -53,6 +53,8 @@ description: 适用于背诵、抽背、默写、文科知识点记忆和文本�
 
 仅当平台无 Python/命令执行能力时，才按 review-engine.md 手写 JSON，字段格式不变。
 
+> 若 `python` 不在 PATH（常见于安装 Python 后未重启的终端/会话），Windows 下直接用等价命令 `learning-memory ...`（同一 CLI 的别名），不要因此降级为手写 JSON。
+
 ## 管理命令
 
 | 命令 | 行为 |

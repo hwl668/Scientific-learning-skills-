@@ -47,6 +47,8 @@ description: 适用于英语单词查询、背单词、词义辨析、近义词/
 
 仅当平台无 Python/命令执行能力时，才按 review-engine.md 手写 `words.json`，字段格式不变。
 
+> 若 `python` 不在 PATH（常见于安装 Python 后未重启的终端/会话），Windows 下直接用等价命令 `learning-memory ...`（同一 CLI 的别名），不要因此降级为手写 JSON。
+
 ## 两种记忆模式
 
 | 模式 | 行为 | 适用场景 |

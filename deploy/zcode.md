@@ -40,6 +40,14 @@ python -m learning_agent.memory.cli status --skill word-deep-dive
 
 需要项目已 `pip install -e` 本仓库（或 `pip install scientific-learning-skills`）。
 
+**`python` 不在 PATH 时**（典型：安装 Python 后没有重启 ZCode/终端，会话继承旧 PATH），Windows 下直接用等价别名（`setup.ps1` 会自动安装到 `%LOCALAPPDATA%\Microsoft\WindowsApps`，该目录在旧 PATH 里也存在）：
+
+```bash
+learning-memory status --skill word-deep-dive
+```
+
+根治方法是完全退出并重启 ZCode，让新会话拿到更新后的 PATH。
+
 ## 注意
 
 - 用户级安装会让 9 个 skill 在你的**所有**工作区可见。coding 工作里说「卡住了」这类词可能误触发 `problem-solving`；不想要时删除 junction 即可（junction 删除不影响源仓库）：`rmdir "$env:USERPROFILE\.zcode\skills"`。

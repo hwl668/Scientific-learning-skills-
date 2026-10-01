@@ -42,6 +42,24 @@ if (-not (Test-Path (Join-Path $skillsLink "scientific-learning\SKILL.md"))) {
 
 Copy-Item (Join-Path $repo "RULES.md") (Join-Path $dest "CLAUDE.md") -Force
 
+# learning-memory.cmd shim: lets content-memory Skills call the CLI even in
+# terminals whose PATH predates the Python installation (no restart needed).
+$pythonExe = Join-Path $env:LOCALAPPDATA "Programs\Python\Python312\python.exe"
+if (-not (Test-Path $pythonExe)) {
+    $resolved = Get-Command python -ErrorAction SilentlyContinue
+    if ($resolved) { $pythonExe = $resolved.Source }
+}
+if (Test-Path $pythonExe) {
+    $shimDir = Join-Path $env:LOCALAPPDATA "Microsoft\WindowsApps"
+    New-Item -ItemType Directory -Force -Path $shimDir | Out-Null
+    $shim = Join-Path $shimDir "learning-memory.cmd"
+    Set-Content -Path $shim -Value "@echo off`r`n`"$pythonExe`" -m learning_agent.memory.cli %*`r`n" -Encoding Ascii
+    Write-Host "Installed CLI shim: $shim (use 'learning-memory' if 'python' is not on PATH)"
+}
+else {
+    Write-Warning "Python not found; skipped learning-memory shim. Review states will need manual JSON until Python is available."
+}
+
 $memoryRoot = if ($Target) { Join-Path (Resolve-Path $Target).Path "memory" } else { Join-Path $repo "memory" }
 $memorySkills = @(
     "word-deep-dive", "text-memorizer", "zero-base-learning", "fuzzy-understanding",
