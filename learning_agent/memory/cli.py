@@ -24,7 +24,6 @@ from typing import Any
 
 from learning_agent.memory.scheduler import (
     MemoryState,
-    days_overdue,
     enrich_item,
     schedule_review,
     sort_for_review,
@@ -51,6 +50,18 @@ MAX_FIELD_CHARS = 100_000
 
 def default_memory_root() -> Path:
     return Path.cwd() / "memory"
+
+
+def _is_due(item: dict, today: date) -> bool:
+    """review-engine.md 的抽取条件：next_review <= 今天（含当天）。"""
+
+    next_review = item.get("next_review")
+    if next_review is None:
+        return True
+    due_day = _parse_day(next_review)
+    if due_day is None:
+        return True
+    return due_day <= today
 
 
 def _today(args_today: str | None) -> date:
@@ -206,8 +217,7 @@ def cmd_due(args: argparse.Namespace) -> dict:
         if args.weak_only and state.correct_streak > WEAK_STREAK_THRESHOLD:
             continue
         if not args.all:
-            due = item.get("next_review") is None or days_overdue(item, today) > 0
-            if not due:
+            if not _is_due(item, today):
                 continue
         pool.append(item)
     ranked = sort_for_review(pool, today)
@@ -248,7 +258,7 @@ def cmd_status(args: argparse.Namespace) -> dict:
             new += 1
         if state.correct_streak <= WEAK_STREAK_THRESHOLD:
             weak += 1
-        if item.get("next_review") is None or days_overdue(item, today) > 0:
+        if _is_due(item, today):
             due += 1
     weakest = sorted(
         (item for item in items if not MemoryState.from_item(item).mastered),

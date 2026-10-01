@@ -64,3 +64,6 @@
 {"text":"我有三个月准备算法竞赛，学习计划怎么做？","skill":"study-plan-builder","category":"plan"}
 {"text":"/scientific-learning 矩阵乘法是什么？","skill":"scientific-learning","category":"router"}
 {"text":"用 scientific-learning 帮我处理这个学习问题：这题我卡住了。","skill":"scientific-learning","category":"router"}
+{"text":"我每天背单词还是忘，怎么办","skill":"word-deep-dive","category":"word"}
+{"text":"背单词总是记了就忘","skill":"word-deep-dive","category":"word"}
+{"text":"考研英语和六级英语有什么区别","skill":"fuzzy-understanding","category":"fuzzy"}

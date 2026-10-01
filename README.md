@@ -149,7 +149,7 @@ bash setup.sh # 自动检测 AI 工具 + 创建软链接 + 初始化 memory
 claude        # 启动，Skills 自动加载
 ```
 
-`setup.sh` 支持 Linux、macOS，以及在 Linux 文件系统内完成 clone 的 WSL 环境。由于 Git for Windows 在 `core.symlinks=false` 时会把仓库符号链接检出为普通文件，当前不承诺 Git Bash 安装路径可用。脚本会为检测到的 Claude Code 创建 `.claude/skills/` 链接并初始化本地 `memory/`；它只检测 Codex CLI，不会为 Codex 自动安装 Skill。Codex 用法见 [`deploy/codex.md`](./deploy/codex.md)。
+`setup.sh` 支持 Linux、macOS，以及在 Linux 文件系统内完成 clone 的 WSL 环境。由于 Git for Windows 在 `core.symlinks=false` 时会把仓库符号链接检出为普通文件，当前不承诺 Git Bash 安装路径可用。**Windows 原生环境改用 `setup.ps1`**（junction 方案，支持 `-Target` 部署到其他项目），见 [`deploy/claude-code.md`](./deploy/claude-code.md)。脚本会为检测到的 Claude Code 创建 `.claude/skills/` 链接并初始化本地 `memory/`；它只检测 Codex CLI，不会为 Codex 自动安装 Skill。Codex 用法见 [`deploy/codex.md`](./deploy/codex.md)。
 
 然后直接说话：
 

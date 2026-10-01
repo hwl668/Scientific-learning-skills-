@@ -161,6 +161,25 @@ class MemoryCliTestCase(unittest.TestCase):
         after = (self.memory_root / "word-deep-dive" / "words.json").read_text(encoding="utf-8")
         self.assertEqual(before, after)
 
+    def test_due_includes_item_scheduled_for_today(self) -> None:
+        # review-engine.md: next_review <= 今天 即到期；答错重置后次日必须被抽到。
+        self.run_cli(
+            "add", "--skill", "word-deep-dive", "--id", "w1", "--word", "undermine",
+            "--today", TODAY,
+        )
+        self.run_cli(
+            "grade", "--skill", "word-deep-dive", "--id", "w1",
+            "--wrong", "--today", TODAY,
+        )
+        report = json.loads(self.json_cli(
+            "due", "--skill", "word-deep-dive", "--today", "2026-10-03"
+        ))
+        self.assertEqual([item["id"] for item in report["items"]], ["w1"])
+        status = json.loads(self.json_cli(
+            "status", "--skill", "word-deep-dive", "--today", "2026-10-03"
+        ))
+        self.assertEqual(status["due"], 1)
+
     def test_due_excludes_future_and_never_drops_new_items(self) -> None:
         self.run_cli(
             "add", "--skill", "word-deep-dive", "--id", "new1", "--word", "aa",

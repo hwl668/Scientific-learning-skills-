@@ -17,6 +17,7 @@
 - [x] 确定性 Memory CLI `learning_agent.memory.cli`（add/due/grade/status/remove）：复习状态改由脚本读写，原子写 + `.bak` 备份 + 损坏报错；`review-engine.md` 与两个内容记忆 Skill 已同步「CLI 优先」
 - [x] 路由三源一致性门禁 `learning_agent.validate_routing`：router 触发词 ↔ `scientific-learning` 路由表 ↔ `RULES.md` 决策树 ↔ 考试名单，已接入 CI 并修复 43 处漂移（含 word-deep-dive 缺失的「四级」）
 - [x] 考频断言防幻觉措辞：`word-deep-dive` 考法边界 + `RULES.md` 事实边界条款
+- [x] 本地实测（独立项目部署 + 模拟辅导会话）驱动修复：「背单词」「有什么区别」触发词、Memory CLI「当天到期」off-by-one、`setup.ps1`（Windows junction 部署，WSL 符号链接在 NTFS 盘上对原生程序不可读）
 - [ ] evals 扩充：真实模型输出 + model-as-judge 打分（LLM 评分）
 - [ ] 真机触发测试：8 个子 skill 的 description 在宿主中的触发/误触率
 
