@@ -32,6 +32,64 @@ SKILLS = (
 
 DEFAULT_SKILL = "zero-base-learning"
 
+# 路由触发词是路由契约的一部分：learning_agent.validate_routing 会校验这些
+# 字面关键词已被 skills/scientific-learning/SKILL.md 路由表和 RULES.md 决策树
+# 覆盖。修改这里之后请同步运行：
+#   python -m learning_agent.validate_routing
+WORD_MEMORY_KEYWORDS = (
+    "复习单词", "单词复习", "单词列表", "单词记忆状态", "删除单词", "查词",
+)
+TEXT_MEMORY_KEYWORDS = (
+    "帮我背", "帮我记", "抽背", "出题", "默写", "复习薄弱点", "全部复习", "关键词触发",
+)
+PLAN_KEYWORDS = (
+    "学习计划", "复习计划", "复习安排", "路线图", "备考", "冲刺", "多久学完",
+    "怎么学完", "自学", "每天", "每周", "通过考试", "短期补齐",
+)
+PLAN_CONFLICT_KEYWORDS = ("这题", "错题", "做错", "答案")
+MISTAKE_KEYWORDS = (
+    "做错", "错题", "错在哪", "为什么错", "答案不一样", "标准答案", "正确答案",
+    "粗心", "扣分", "错因", "漏掉", "复盘",
+)
+DEEPENING_KEYWORDS = (
+    "讲透", "本质", "多角度", "更深入", "深入理解", "证明思路", "推导", "反例",
+    "联系", "为什么真正", "还能怎么看", "为什么重要", "结构理解",
+)
+DEEPENING_REGEX_PATTERNS = (r"为什么.+可以用于",)
+PROBLEM_KEYWORDS = (
+    "这题", "题目", "求解", "证明", "怎么做", "不会做", "卡住", "解题",
+    "算不出来", "做不出来", "lim", "极限题",
+)
+FUZZY_KEYWORDS = (
+    "学过", "听过", "会算", "会背", "会套", "不理解", "看不懂", "分不清",
+    "不会用", "云里雾里", "一看", "懵", "到底在干什么",
+)
+ZERO_BASE_KEYWORDS = (
+    "是什么", "什么是", "第一次", "完全不懂", "零基础", "从零", "入门",
+    "讲一下", "介绍一下",
+)
+ZERO_BASE_REGEX_PATTERNS = (r"^.+是什么[？?]?$", r"^什么是.+", r".+怎么理解[？?]?$")
+
+# word-deep-dive 支持的考试名单：regex 与该 Skill 文档的「支持的考试」共用此来源。
+EXAM_NAMES = ("六级", "四级", "考研", "雅思", "托福", "GRE", "专四", "专八", "高考")
+
+_ROUTING_KEYWORD_RULES: dict[str, tuple[str, ...]] = {
+    "word-deep-dive": WORD_MEMORY_KEYWORDS,
+    "text-memorizer": TEXT_MEMORY_KEYWORDS,
+    "study-plan-builder": PLAN_KEYWORDS,
+    "mistake-review": MISTAKE_KEYWORDS,
+    "deepening-learning": DEEPENING_KEYWORDS,
+    "problem-solving": PROBLEM_KEYWORDS,
+    "fuzzy-understanding": FUZZY_KEYWORDS,
+    "zero-base-learning": ZERO_BASE_KEYWORDS,
+}
+
+
+def routing_keyword_rules() -> dict[str, tuple[str, ...]]:
+    """Literal router triggers per skill, for the routing-consistency validator."""
+
+    return {skill: tuple(keywords) for skill, keywords in _ROUTING_KEYWORD_RULES.items()}
+
 
 @dataclass(frozen=True)
 class RouteResult:
@@ -59,9 +117,12 @@ def _regex_any(text: str, patterns: tuple[str, ...]) -> list[str]:
     return [pattern for pattern in patterns if re.search(pattern, text, re.I)]
 
 
+_EXAM_ALTERNATION = "|".join(re.escape(exam) for exam in EXAM_NAMES) + "|gre"
+
+
 def _looks_like_single_english_word(text: str) -> bool:
     cleaned = text.strip()
-    return bool(re.fullmatch(r"!?[A-Za-z][A-Za-z'-]*(?:\s+(?:六级|四级|考研|雅思|托福|GRE|gre|专四|专八|高考))?", cleaned))
+    return bool(re.fullmatch(rf"!?[A-Za-z][A-Za-z'-]*(?:\s+(?:{_EXAM_ALTERNATION}))?", cleaned))
 
 
 def _looks_like_english_word_comparison(text: str) -> bool:
@@ -93,10 +154,7 @@ def route(text: str) -> RouteResult:
     if normalized.startswith("/scientific-learning") or "用 scientific-learning" in normalized:
         return RouteResult("scientific-learning", 1.0, ("explicit:scientific-learning",))
 
-    word_memory = _contains_any(
-        normalized,
-        ("复习单词", "单词复习", "单词列表", "单词记忆状态", "删除单词", "查词"),
-    )
+    word_memory = _contains_any(normalized, WORD_MEMORY_KEYWORDS)
     is_single_word = _looks_like_single_english_word(text)
     is_word_comparison = _looks_like_english_word_comparison(normalized)
     if word_memory or is_single_word or is_word_comparison:
@@ -107,58 +165,37 @@ def route(text: str) -> RouteResult:
             rules += ("word:english-word-comparison",)
         return RouteResult("word-deep-dive", 0.95, rules)
 
-    text_memory = _contains_any(
-        normalized,
-        ("帮我背", "帮我记", "抽背", "出题", "默写", "复习薄弱点", "全部复习", "关键词触发"),
-    )
+    text_memory = _contains_any(normalized, TEXT_MEMORY_KEYWORDS)
     if text_memory:
         return RouteResult("text-memorizer", 0.95, tuple(f"text-memory:{m}" for m in text_memory))
 
-    plan_matches = _contains_any(
-        normalized,
-        ("学习计划", "复习计划", "复习安排", "路线图", "备考", "冲刺", "多久学完", "怎么学完", "自学", "每天", "每周", "通过考试", "短期补齐"),
-    )
-    if plan_matches and not _contains_any(normalized, ("这题", "错题", "做错", "答案")):
+    plan_matches = _contains_any(normalized, PLAN_KEYWORDS)
+    if plan_matches and not _contains_any(normalized, PLAN_CONFLICT_KEYWORDS):
         return RouteResult("study-plan-builder", 0.9, tuple(f"plan:{m}" for m in plan_matches))
 
-    mistake_matches = _contains_any(
-        normalized,
-        ("做错", "错题", "错在哪", "为什么错", "答案不一样", "标准答案", "正确答案", "粗心", "扣分", "错因", "漏掉", "复盘"),
-    )
+    mistake_matches = _contains_any(normalized, MISTAKE_KEYWORDS)
     if mistake_matches:
         return RouteResult("mistake-review", 0.95, tuple(f"mistake:{m}" for m in mistake_matches))
 
-    deep_matches = _contains_any(
-        normalized,
-        ("讲透", "本质", "多角度", "更深入", "深入理解", "证明思路", "推导", "反例", "联系", "为什么真正", "还能怎么看", "为什么重要", "结构理解"),
-    )
-    deep_regex_matches = _regex_any(normalized, (r"为什么.+可以用于",))
+    deep_matches = _contains_any(normalized, DEEPENING_KEYWORDS)
+    deep_regex_matches = _regex_any(normalized, DEEPENING_REGEX_PATTERNS)
     if deep_matches or deep_regex_matches:
         rules = tuple(f"deep:{m}" for m in deep_matches) + tuple(f"deep-regex:{m}" for m in deep_regex_matches)
         return RouteResult("deepening-learning", 0.85, rules)
 
-    problem_matches = _contains_any(
-        normalized,
-        ("这题", "题目", "求解", "证明", "怎么做", "不会做", "卡住", "解题", "算不出来", "做不出来", "lim", "极限题"),
-    )
+    problem_matches = _contains_any(normalized, PROBLEM_KEYWORDS)
     if problem_matches:
         return RouteResult("problem-solving", 0.9, tuple(f"problem:{m}" for m in problem_matches))
 
-    fuzzy_matches = _contains_any(
-        normalized,
-        ("学过", "听过", "会算", "会背", "会套", "不理解", "看不懂", "分不清", "不会用", "云里雾里", "一看", "懵", "到底在干什么"),
-    )
+    fuzzy_matches = _contains_any(normalized, FUZZY_KEYWORDS)
     if fuzzy_matches:
         return RouteResult("fuzzy-understanding", 0.9, tuple(f"fuzzy:{m}" for m in fuzzy_matches))
 
-    zero_matches = _contains_any(
-        normalized,
-        ("是什么", "什么是", "第一次", "完全不懂", "零基础", "从零", "入门", "讲一下", "介绍一下"),
-    )
+    zero_matches = _contains_any(normalized, ZERO_BASE_KEYWORDS)
     if zero_matches:
         return RouteResult("zero-base-learning", 0.85, tuple(f"zero:{m}" for m in zero_matches))
 
-    question_matches = _regex_any(normalized, (r"^.+是什么[？?]?$", r"^什么是.+", r".+怎么理解[？?]?$"))
+    question_matches = _regex_any(normalized, ZERO_BASE_REGEX_PATTERNS)
     if question_matches:
         return RouteResult("zero-base-learning", 0.65, tuple(f"zero-regex:{m}" for m in question_matches))
 

@@ -26,6 +26,8 @@ jobs:
         run: python -m pip install -e ".[validation]"
       - name: Parse and validate every Skill
         run: python -B -m learning_agent.validate_skills
+      - name: Validate routing-contract consistency
+        run: python -B -m learning_agent.validate_routing
 
   eval-quick:
     name: Python & Eval (${{ matrix.python-version }})
