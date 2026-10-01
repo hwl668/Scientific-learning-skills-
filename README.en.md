@@ -95,6 +95,15 @@ The checked-in baseline and Skill examples can be scored with `python -B eval.py
 
 ## Quick Start
 
+Claude Code users can install as a plugin without cloning:
+
+```text
+/plugin marketplace add hwl668/Scientific-learning-skills-
+/plugin install scientific-learning-skills@scientific-learning-skills
+```
+
+For the full experience (memory data + deterministic review CLI), clone:
+
 ```bash
 git clone https://github.com/hwl668/Scientific-learning-skills-.git scientific-learning-skills
 cd scientific-learning-skills

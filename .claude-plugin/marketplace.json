@@ -1,0 +1,14 @@
+{
+  "name": "scientific-learning-skills",
+  "owner": {
+    "name": "hwl668",
+    "url": "https://github.com/hwl668"
+  },
+  "plugins": [
+    {
+      "name": "scientific-learning-skills",
+      "source": "./",
+      "description": "Diagnosis-first learning tutor skills: 零基础讲解、卡点诊断、解题引导、错题复盘、单词深挖、背诵抽测、学习计划。"
+    }
+  ]
+}

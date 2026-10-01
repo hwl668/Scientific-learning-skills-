@@ -7,6 +7,28 @@ description: 所有内容记忆型 Skill 共享的间隔复习引擎规则。
 
 所有内容记忆型 Skill（`word-deep-dive`、`text-memorizer`）使用此引擎管理间隔复习。
 
+## 确定性 CLI（推荐路径）
+
+本引擎的间隔规则、复习抽取和状态更新已经有确定性实现。**宿主环境有 Python 时，一律通过 CLI 读写记忆，不要手写 JSON**——手写容易造成字段漂移、日期格式错误和覆盖丢数据；手写 JSON 仅作为无 Python 平台（如纯网页对话）的回退方案，文件格式两者完全一致。
+
+```bash
+# 存入（幂等：重复 add 只刷新内容字段，保留复习状态）
+python -m learning_agent.memory.cli add --skill word-deep-dive --id complimentary --word complimentary --exam 六级 --note "免费的；赞美的"
+python -m learning_agent.memory.cli add --skill text-memorizer --id kp-1 --content "实践是检验真理的唯一标准" --module 真理观
+
+# 抽取到期项（按遗忘风险 + 薄弱优先排序；--weak-only 只取薄弱项；--all 忽略间隔）
+python -m learning_agent.memory.cli due --skill word-deep-dive --limit 6
+
+# 记录自评结果（--correct 等价 quality=5；--wrong 等价 quality=1，重置间隔）
+python -m learning_agent.memory.cli grade --skill word-deep-dive --id complimentary --correct
+
+# 状态摘要 / 删除（--json 可获得机器可读输出）
+python -m learning_agent.memory.cli status --skill word-deep-dive
+python -m learning_agent.memory.cli remove --skill word-deep-dive --id complimentary
+```
+
+CLI 的存储位置与下文一致（`memory/{skill-name}/`），默认相对当前目录，可用 `--memory-root` 指定。写入是原子操作并自动保留 `.bak` 备份；遇到损坏的记忆文件会报错退出而不是当成空库覆盖。
+
 ## 存储格式
 
 各 Skill 在自己的 `memory/{skill-name}/` 下存储数据。每条记忆记录必须包含以下字段：

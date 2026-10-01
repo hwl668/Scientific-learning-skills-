@@ -130,7 +130,7 @@ study-plan-builder 发现"用户对自己的基础判断有误"
 
 - 每个 Skill **自己决定**何时写入、读取、清除其 Memory。
 - Memory 写入是**低摩擦的**——Skill 在输出中不询问"要不要存"，而是根据 Skill 自身规则自动判断。
-- 内容记忆型 Skill 的复习间隔严格按 `review-engine.md` 执行。
+- 内容记忆型 Skill 的复习间隔严格按 `review-engine.md` 执行。宿主有 Python 时，间隔状态读写一律通过 `python -m learning_agent.memory.cli`（add/due/grade/status/remove）完成，不要手写 JSON；无 Python 平台才手写，字段格式不变。
 - 分析记忆型 Skill 的 Memory 不参与间隔复习，仅在 Skill 执行时作为上下文参考。
 - 用户可以通过以下命令管理 Memory：
   - `清除 [skill-name] 记忆`：删除指定 Skill 的 Memory 目录

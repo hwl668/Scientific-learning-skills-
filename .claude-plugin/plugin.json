@@ -1,0 +1,19 @@
+{
+  "name": "scientific-learning-skills",
+  "version": "0.3.0",
+  "description": "Diagnosis-first learning tutor skills: 零基础讲解、卡点诊断、解题引导、错题复盘、单词深挖、背诵抽测、学习计划。Turns AI from answer machine into diagnostic tutor.",
+  "author": {
+    "name": "hwl668",
+    "url": "https://github.com/hwl668"
+  },
+  "homepage": "https://github.com/hwl668/Scientific-learning-skills-",
+  "license": "MIT",
+  "keywords": [
+    "education",
+    "learning",
+    "tutoring",
+    "stem",
+    "spaced-repetition",
+    "diagnostic"
+  ]
+}

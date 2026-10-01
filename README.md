@@ -133,6 +133,15 @@ Q3: 关键词"直接现实性"→ 请复述相关要点。
 
 ## 快速开始
 
+Claude Code 用户可以免克隆直接装插件：
+
+```text
+/plugin marketplace add hwl668/Scientific-learning-skills-
+/plugin install scientific-learning-skills@scientific-learning-skills
+```
+
+完整功能（Memory 数据 + 确定性复习 CLI）建议克隆安装：
+
 ```bash
 git clone https://github.com/hwl668/Scientific-learning-skills-.git scientific-learning-skills
 cd scientific-learning-skills
@@ -220,7 +229,7 @@ Skills 本质是结构化 Markdown 指令集。在支持 Agent Skills 的宿主�
 
 | 平台 | 部署方式 | 说明 |
 |------|---------|------|
-| Claude Code | `.claude/skills/` 自动加载 | [详细说明](./deploy/claude-code.md) |
+| Claude Code | 插件安装或 `.claude/skills/` 自动加载 | [详细说明](./deploy/claude-code.md) |
 | OpenAI Codex / API / GPTs | 原生 Skill（宿主支持时）或合成指令 | [详细说明](./deploy/codex.md) |
 | OpenClaw / OI | Skills 目录或系统提示 | [详细说明](./deploy/openclaw.md) |
 | Cursor / Cline / Copilot | 规则文件或自定义指令 | [详细说明](./deploy/generic.md) |

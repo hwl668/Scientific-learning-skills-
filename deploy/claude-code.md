@@ -1,6 +1,17 @@
 # 部署到 Claude Code
 
-## 自动加载（推荐）
+## 插件安装（推荐，免克隆）
+
+仓库提供 `.claude-plugin/` 清单，可直接作为 Claude Code 插件安装：
+
+```text
+/plugin marketplace add hwl668/Scientific-learning-skills-
+/plugin install scientific-learning-skills@scientific-learning-skills
+```
+
+注意：插件方式只安装 Skills 本身；Memory 数据和 `python -m learning_agent.memory.cli` 工具仍建议按下面的克隆方式使用。
+
+## 自动加载（克隆方式）
 
 Claude Code 自动读取 `.claude/skills/` 下的 Skill 文件和 `.claude/CLAUDE.md` 规则文件。本项目已预置符号链接：
 

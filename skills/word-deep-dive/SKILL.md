@@ -33,6 +33,20 @@ description: 适用于英语单词查询、背单词、词义辨析、近义词/
 - 自评机制
 - 掌握标准（连续 5 次正确 = mastered）
 
+## 读写方式：CLI 优先
+
+宿主环境有 Python 时，所有记忆读写通过确定性 CLI 完成，**不要手写 JSON**（字段漂移和覆盖丢数据的风险）：
+
+| 操作 | 命令 |
+|------|------|
+| 存入/更新 | `python -m learning_agent.memory.cli add --skill word-deep-dive --id <word> --word <word> [--exam 六级] [--note 释义]` |
+| 抽取到期词 | `python -m learning_agent.memory.cli due --skill word-deep-dive [--limit 6]` |
+| 记录自评 | `python -m learning_agent.memory.cli grade --skill word-deep-dive --id <word> --correct`（或 `--wrong`） |
+| 状态摘要 | `python -m learning_agent.memory.cli status --skill word-deep-dive` |
+| 删除 | `python -m learning_agent.memory.cli remove --skill word-deep-dive --id <word>` |
+
+仅当平台无 Python/命令执行能力时，才按 review-engine.md 手写 `words.json`，字段格式不变。
+
 ## 两种记忆模式
 
 | 模式 | 行为 | 适用场景 |
@@ -95,7 +109,7 @@ complimentary           → 标记模式下仅查词不存入
 | `undermine 六级` | 查词，考试=六级 |
 | `!undermine 六级` | 查词 + 存入记忆，绑定六级 |
 
-支持的考试：六级、考研、雅思、托福、GRE、专四、专八、高考。
+支持的考试：六级、四级、考研、雅思、托福、GRE、专四、专八、高考。考试名单与 `learning_agent/router.py` 的 `EXAM_NAMES` 保持一致。
 
 ## 上下文判断
 
@@ -145,6 +159,11 @@ complimentary           → 标记模式下仅查词不存入
 ## 7. 针对性考法
 
 指定考试：频率/常考题型/典型陷阱/真题模拟/估分价值。未指定：速查表。
+
+**考频信息的事实边界（防幻觉）**：
+- 不虚构考频数据和真题。「高频/中频/低频」只在基于公开备考共识时使用，否则降级为「常考/较少考」并标注（经验判断）。
+- 不引用具体真题原文、年份、题号——除非用户提供的上下文里确实有。
+- 不确定的信息直接说不确定；备考建议宁可保守（多覆盖），不要虚构精确的「分值占比」。
 
 ## 8. 备考建议
 
@@ -234,6 +253,7 @@ complimentary           → 标记模式下仅查词不存入
 - 标记模式下不要在用户没加 `!` 时存入记忆
 - 不要在输出末尾提示"要不要存入记忆"——看标记自己判断，不加交互摩擦
 - 不要跳过常见误区——这是 P0 强制项
+- 不要虚构考频、真题原文和分值占比——没有把握就用「常考/较少考（经验判断）」级别的措辞
 
 # 测试样例
 
@@ -242,12 +262,12 @@ complimentary           → 标记模式下仅查词不存入
 **期望输出方向**：
 1. 解析：单词=complimentary，考试=六级，标记=存入记忆
 2. 卡片顶部显示 `📌 记忆状态：已存入（新词，第 1 天复习）`
-3. 标注频率：义项"免费的"（六级中频），"赞美的"（六级低频）
-4. 形近词：complementary 加粗+警示——六级选词填空经典陷阱
+3. 标注频率：义项"免费的"（六级常考，经验判断），"赞美的"（较少考，经验判断）
+4. 形近词：complementary 加粗+警示——六级选词填空的常见辨析陷阱（经验判断）
 5. 常见误区表：
-   - 和 complementary 混用（选词填空最高频陷阱）
+   - 和 complementary 混用（选词填空高频陷阱，经验判断）
    - 以为"免费的"义项是口语词（实际是正式服务场景用语）
-6. 考法：中频，选词填空辨析 + 阅读同义替换，估分价值中
+6. 考法：常考（经验判断），选词填空辨析 + 阅读同义替换，估分价值中
 7. 备考建议：被动识别即可，行动清单 + 关联词
 8. 记忆锚点：compl-I-ment → "I 赞美你" → 酒店赞美你送你免费早餐
 9. 实际写入 `memory/word-deep-dive/words.json`

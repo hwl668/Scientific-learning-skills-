@@ -39,6 +39,20 @@ description: 适用于背诵、抽背、默写、文科知识点记忆和文本�
 - 每次抽 3-5 题，避免疲劳
 - 错题立即展示正确答案和辨析
 
+## 读写方式：CLI 优先
+
+宿主环境有 Python 时，所有记忆读写通过确定性 CLI 完成，**不要手写 JSON**。题库用 `--file questions`（默认），薄弱点用 `--file weak-points`：
+
+| 操作 | 命令 |
+|------|------|
+| 存入知识点 | `python -m learning_agent.memory.cli add --skill text-memorizer --id kp-1 --content "要点" [--module 模块名]` |
+| 存入薄弱点 | `... add --skill text-memorizer --file weak-points --id wp-1 --content "..."` |
+| 抽题 | `python -m learning_agent.memory.cli due --skill text-memorizer [--weak-only] [--limit 5]` |
+| 记录自评 | `python -m learning_agent.memory.cli grade --skill text-memorizer --id kp-1 --correct`（或 `--wrong`） |
+| 状态摘要 | `python -m learning_agent.memory.cli status --skill text-memorizer [--file weak-points]` |
+
+仅当平台无 Python/命令执行能力时，才按 review-engine.md 手写 JSON，字段格式不变。
+
 ## 管理命令
 
 | 命令 | 行为 |

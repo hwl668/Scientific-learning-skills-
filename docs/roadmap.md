@@ -10,7 +10,15 @@
 - [x] `README.en.md` 英文版
 - [x] `CONTRIBUTING.md` 贡献指南完善
 - [x] 学科扩展方案（`docs/subject-expansion-plan.md`）
-- [ ] `plugin.json` 插件清单（draft 在 `docs/plugin-manifest-draft.json`，待规范稳定后启用）
+- [x] `plugin.json` 插件清单（`.claude-plugin/plugin.json` + `marketplace.json`，支持 `/plugin marketplace add` 一键安装）
+
+## v0.4: 工程强化（进行中）
+
+- [x] 确定性 Memory CLI `learning_agent.memory.cli`（add/due/grade/status/remove）：复习状态改由脚本读写，原子写 + `.bak` 备份 + 损坏报错；`review-engine.md` 与两个内容记忆 Skill 已同步「CLI 优先」
+- [x] 路由三源一致性门禁 `learning_agent.validate_routing`：router 触发词 ↔ `scientific-learning` 路由表 ↔ `RULES.md` 决策树 ↔ 考试名单，已接入 CI 并修复 43 处漂移（含 word-deep-dive 缺失的「四级」）
+- [x] 考频断言防幻觉措辞：`word-deep-dive` 考法边界 + `RULES.md` 事实边界条款
+- [ ] evals 扩充：真实模型输出 + model-as-judge 打分（LLM 评分）
+- [ ] 真机触发测试：8 个子 skill 的 description 在宿主中的触发/误触率
 
 ## v0.2: Learning Agent Framework Prototype
 
