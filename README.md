@@ -1,11 +1,38 @@
 # Scientific Learning Skills
 
-> A student-facing Agent Skills prototype for diagnosis-before-explanation tutoring.
+> **AI tutors explain too early. We diagnose first.**
+>
+> 先诊断，再讲解：识别学习者*为什么*卡住，给最小的针对性干预，用变式题验证真正理解。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-![Platforms](https://img.shields.io/badge/Platform-Claude%20Code%20|%20Codex%20|%20OpenClaw%20|%20GPTs%20|%20Generic-lightgrey)
+![Platforms](https://img.shields.io/badge/Platform-Claude%20Code%20|%20ZCode%20|%20Codex%20|%20OpenClaw%20|%20GPTs%20|%20Generic-lightgrey)
 
-[Quick Start](#快速开始) · [Demo](./demo/) · [Evidence](#证据边界与本地验证) · [设计对比](#设计对比示例) · [Platforms](#安装到其他平台) · [English](./README.en.md)
+[Quick Start](#快速开始) · [Demo](./demo/) · [证据](#证据边界与本地验证) · [设计对比](#设计对比示例) · [Platforms](#安装到其他平台) · [English](./README.en.md)
+
+---
+
+## 一套教学法，不是一个 Prompt 堆
+
+同一个问题，「讲得多」和「教得好」是两回事。本项目把**诊断 → 干预 → 验证 → 迁移**做成可组合的 Agent Skills，让模型先判断学习者卡在哪，再决定说什么：
+
+```text
+"我会算矩阵乘法，但不知道它到底在算什么。"
+        │
+        ▼
+  诊断学习者状态（6 类卡点：概念混淆 / 符号不懂 / 推导断裂 /
+                  前置缺失 / 不会迁移 / 会套不会懂）
+        │
+        ▼
+  最小针对性干预 —— 只修卡住的部分，不重讲一遍
+        │
+        ▼
+  验证理解（让学习者自己重新解释）
+        │
+        ▼
+  变式迁移（换条件还会做，才算真懂）──► 写入记忆，间隔复习
+```
+
+9 个子 Skill 按**学习阶段**分工（而不是按学科堆数量）：零基础 / 模糊理解 / 深化 / 解题 / 错题 / 单词 / 背诵 / 计划，加 1 个路由总入口。配套确定性复习引擎（SM-2 风格间隔调度）和路由一致性 CI 门禁。
 
 ---
 
@@ -133,19 +160,25 @@ Q3: 关键词"直接现实性"→ 请复述相关要点。
 
 ## 快速开始
 
-Claude Code 用户可以免克隆直接装插件：
+**方式一：`npx skills add`（推荐，任何支持 Agent Skills 的宿主）**
+
+```bash
+npx skills add hwl668/Scientific-learning-skills-
+```
+
+**方式二：Claude Code 插件（免克隆）**
 
 ```text
 /plugin marketplace add hwl668/Scientific-learning-skills-
 /plugin install scientific-learning-skills@scientific-learning-skills
 ```
 
-完整功能（Memory 数据 + 确定性复习 CLI）建议克隆安装：
+**方式三：克隆安装（完整功能：Memory 数据 + 确定性复习 CLI）**
 
 ```bash
 git clone https://github.com/hwl668/Scientific-learning-skills-.git scientific-learning-skills
 cd scientific-learning-skills
-bash setup.sh # 自动检测 AI 工具 + 创建软链接 + 初始化 memory
+bash setup.sh # Linux/macOS/WSL；Windows 用 powershell -File setup.ps1
 claude        # 启动，Skills 自动加载
 ```
 
@@ -204,6 +237,8 @@ python -B -m learning_agent.eval.runner --suite evals/cases/smoke.jsonl --report
 | 真实用户研究 | **尚未提供** | 学习成绩提升、迁移效果或长期保持 |
 
 Learned router 的训练报告应与数据集指纹、切分策略一起阅读。即使合成 holdout 上的指标很高，也不应写成“真实准确率 100%”或“已证明提升学习效果”。
+
+**下一阶段的目标是把证据升级为真实模型对照评测**（三条件：裸模型 / 通用家教提示 / 本项目 Skill × 三层指标：指令遵循 / LLM-as-judge 质量 / 模拟学习者后测增益 + TER 靶向率）。设计与运行协议见 [`docs/learning-skill-bench.md`](./docs/learning-skill-bench.md)；在该评测产出真实数据之前，本 README 不展示任何效果提升数字。
 
 安全模型格式、完整哈希、切分限制和适用边界见 [`artifacts/README.md`](./artifacts/README.md)。
 

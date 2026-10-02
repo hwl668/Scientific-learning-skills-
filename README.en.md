@@ -1,11 +1,38 @@
 # Scientific Learning Skills
 
-> A student-facing Agent Skills prototype for diagnosis-before-explanation tutoring.
+> **AI tutors explain too early. We diagnose first.**
+>
+> A cross-platform tutoring skill system that identifies *why* a learner is stuck, applies the smallest targeted intervention, and verifies understanding through transfer tasks.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-![Platforms](https://img.shields.io/badge/Platform-Claude%20Code%20|%20Codex%20|%20OpenClaw%20|%20GPTs%20|%20Generic-lightgrey)
+![Platforms](https://img.shields.io/badge/Platform-Claude%20Code%20|%20ZCode%20|%20Codex%20|%20OpenClaw%20|%20GPTs%20|%20Generic-lightgrey)
 
 [中文版](./README.md)
+
+---
+
+## One tutoring methodology, not a prompt pile
+
+"Explaining more" and "teaching well" are different things. This project turns **Diagnose → Intervene → Verify → Transfer** into composable Agent Skills:
+
+```text
+"I can multiply matrices but don't know what multiplication means."
+        │
+        ▼
+  Diagnose learner state (6 gap types: confusion / notation /
+        derivation break / missing prerequisite / no transfer / formula-without-why)
+        │
+        ▼
+  Smallest targeted intervention — fix only what is broken
+        │
+        ▼
+  Verify (learner re-explains in their own words)
+        │
+        ▼
+  Transfer task (changed conditions count as real understanding) ──► spaced review
+```
+
+9 sub-skills split by **learning stage** (not by subject count): zero-base / fuzzy-understanding / deepening / problem-solving / mistake-review / word / memorization / study-plan, plus 1 routing entry. Ships with a deterministic SM-2-style review engine and a routing-consistency CI gate.
 
 ---
 
