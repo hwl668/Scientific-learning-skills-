@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 ![Platforms](https://img.shields.io/badge/Platform-Claude%20Code%20|%20ZCode%20|%20Codex%20|%20OpenClaw%20|%20GPTs%20|%20Generic-lightgrey)
 
-[Quick Start](#快速开始) · [Demo](./demo/) · [证据](#证据边界与本地验证) · [设计对比](#设计对比示例) · [Platforms](#安装到其他平台) · [English](./README.en.md)
+[Quick Start](#快速开始) · [Demo](./demo/) · [证据](#证据边界与本地验证) · [设计对比](#设计对比示例) · [测试指南](./docs/testing-guide.md) · [English](./README.en.md)
 
 ---
 
