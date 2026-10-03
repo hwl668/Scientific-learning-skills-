@@ -67,3 +67,33 @@
 {"text":"我每天背单词还是忘，怎么办","skill":"word-deep-dive","category":"word"}
 {"text":"背单词总是记了就忘","skill":"word-deep-dive","category":"word"}
 {"text":"考研英语和六级英语有什么区别","skill":"fuzzy-understanding","category":"fuzzy"}
+{"text": "什么是极限？我第一次接触，高中只学过函数。", "skill": "zero-base-learning", "category": "zero", "from": "bench-v0.1"}
+{"text": "导数到底是什么意思？完全没学过。", "skill": "zero-base-learning", "category": "zero", "from": "bench-v0.1"}
+{"text": "什么是向量空间？我完全没学过线代。", "skill": "zero-base-learning", "category": "zero", "from": "bench-v0.1"}
+{"text": "概率里的期望是什么意思？没学过概率论。", "skill": "zero-base-learning", "category": "zero", "from": "bench-v0.1"}
+{"text": "进程和线程是什么？操作系统这块完全没学过。", "skill": "zero-base-learning", "category": "zero", "from": "bench-v0.1"}
+{"text": "惯性到底是个什么东西？初学物理。", "skill": "zero-base-learning", "category": "zero", "from": "bench-v0.1"}
+{"text": "什么是死锁？操作系统第一次接触。", "skill": "zero-base-learning", "category": "zero", "from": "bench-v0.1"}
+{"text": "我会算两个矩阵的乘法，但完全不知道这一堆乘加在干什么。", "skill": "fuzzy-understanding", "category": "fuzzy", "from": "bench-v0.1"}
+{"text": "傅里叶变换的公式我会用，但不知道它到底在干什么。", "skill": "fuzzy-understanding", "category": "fuzzy", "from": "bench-v0.1"}
+{"text": "概率密度函数和分布函数我老搞混，做题就出错。", "skill": "fuzzy-understanding", "category": "fuzzy", "from": "bench-v0.1"}
+{"text": "TCP 和 UDP 的区别我背了好多遍，做题的时候还是不会用。", "skill": "fuzzy-understanding", "category": "fuzzy", "from": "bench-v0.1"}
+{"text": "动态规划我一看题解就懂，自己推状态转移方程就不行。", "skill": "fuzzy-understanding", "category": "fuzzy", "from": "bench-v0.1"}
+{"text": "动量定理我背下来了，但一到题里就不会用了。", "skill": "fuzzy-understanding", "category": "fuzzy", "from": "bench-v0.1"}
+{"text": "袋子里 3 红 2 白球，不放回取两次，第二次取到红球的概率怎么求？", "skill": "problem-solving", "category": "problem", "from": "bench-v0.1"}
+{"text": "最长上升子序列这道 DP 题，状态转移方程我推不出来。", "skill": "problem-solving", "category": "problem", "from": "bench-v0.1"}
+{"text": "图论题：n 个城市之间修路使总花费最少，该用 Kruskal 还是 Prim？步骤怎么写？", "skill": "problem-solving", "category": "problem", "from": "bench-v0.1"}
+{"text": "物理题：传送带匀速转动，物体滑上去，求摩擦生热。完全没有思路。", "skill": "problem-solving", "category": "problem", "from": "bench-v0.1"}
+{"text": "二分查找的边界老是写错：数组 [1,2,2,2,3] 找第一个 2，left 和 right 该怎么定？", "skill": "problem-solving", "category": "problem", "from": "bench-v0.1"}
+{"text": "两个电阻混联求等效电阻的题，我没有思路。", "skill": "problem-solving", "category": "problem", "from": "bench-v0.1"}
+{"text": "逻辑推理题：甲乙丙三人只有一个说真话，判断谁是凶手。求解题思路。", "skill": "problem-solving", "category": "problem", "from": "bench-v0.1"}
+{"text": "求微分方程 y'' + y = 0 的通解，步骤不会写。", "skill": "problem-solving", "category": "problem", "from": "bench-v0.1"}
+{"text": "概率题：三个人轮流投篮，先投中的人赢，第一个人的获胜概率怎么求？", "skill": "problem-solving", "category": "problem", "from": "bench-v0.1"}
+{"text": "我算 ∫(-1 到 1) 1/x² dx 得 -2，答案是发散。错在哪？", "skill": "mistake-review", "category": "mistake", "from": "bench-v0.1"}
+{"text": "我的 C 代码数组越界了：我以为大小 10 的数组能从下标 1 存到 10。错在哪？", "skill": "mistake-review", "category": "mistake", "from": "bench-v0.1"}
+{"text": "我以为加了判空就不会崩，结果还是段错误。我的理解错在哪？", "skill": "mistake-review", "category": "mistake", "from": "bench-v0.1"}
+{"text": "期望和均值有什么本质区别？什么时候平均这个直觉会失效？", "skill": "deepening-learning", "category": "deep", "from": "bench-v0.1"}
+{"text": "讲透数学归纳法的本质：为什么奠基加归纳就能对无穷多个自然数成立？", "skill": "deepening-learning", "category": "deep", "from": "bench-v0.1"}
+{"text": "abundant 这个词怎么用？", "skill": "word-deep-dive", "category": "word", "from": "bench-v0.1"}
+{"text": "帮我背这段马原：物质决定意识，意识对物质具有能动的反作用。", "skill": "text-memorizer", "category": "text", "from": "bench-v0.1"}
+{"text": "六级还有 40 天，单词和听力怎么安排？", "skill": "study-plan-builder", "category": "plan", "from": "bench-v0.1"}

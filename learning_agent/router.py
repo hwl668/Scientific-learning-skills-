@@ -37,14 +37,14 @@ DEFAULT_SKILL = "zero-base-learning"
 # 覆盖。修改这里之后请同步运行：
 #   python -m learning_agent.validate_routing
 WORD_MEMORY_KEYWORDS = (
-    "复习单词", "单词复习", "单词列表", "单词记忆状态", "删除单词", "查词", "背单词",
+    "复习单词", "单词复习", "单词列表", "单词记忆状态", "删除单词", "查词", "背单词", "这个词",
 )
 TEXT_MEMORY_KEYWORDS = (
     "帮我背", "帮我记", "抽背", "出题", "默写", "复习薄弱点", "全部复习", "关键词触发",
 )
 PLAN_KEYWORDS = (
     "学习计划", "复习计划", "复习安排", "路线图", "备考", "冲刺", "多久学完",
-    "怎么学完", "自学", "每天", "每周", "通过考试", "短期补齐",
+    "怎么学完", "自学", "每天", "每周", "通过考试", "短期补齐", "怎么安排",
 )
 PLAN_CONFLICT_KEYWORDS = ("这题", "错题", "做错", "答案")
 MISTAKE_KEYWORDS = (
@@ -58,15 +58,19 @@ DEEPENING_KEYWORDS = (
 DEEPENING_REGEX_PATTERNS = (r"为什么.+可以用于",)
 PROBLEM_KEYWORDS = (
     "这题", "题目", "求解", "证明", "怎么做", "不会做", "卡住", "解题",
-    "算不出来", "做不出来", "lim", "极限题",
+    "算不出来", "做不出来", "推不出来", "不会写", "怎么写", "怎么求", "怎么定",
+    "没有思路", "没思路", "lim", "极限题",
 )
 FUZZY_KEYWORDS = (
     "学过", "听过", "会算", "会背", "会套", "不理解", "看不懂", "分不清",
-    "不会用", "云里雾里", "一看", "懵", "到底在干什么", "有什么区别",
+    "不会用", "云里雾里", "一看", "懵", "到底在干什么", "有什么区别", "搞混",
 )
+# 「完全没学过 X」是零基础信号，不能因为包含「学过」子串就进模糊理解；
+# 「第一次接触/零基础/从零」同理——它们指的目标概念是全新的。
+FUZZY_CONFLICT_KEYWORDS = ("没学过", "从没学过", "第一次", "零基础", "从零")
 ZERO_BASE_KEYWORDS = (
     "是什么", "什么是", "第一次", "完全不懂", "零基础", "从零", "入门",
-    "讲一下", "介绍一下",
+    "讲一下", "介绍一下", "没学过",
 )
 ZERO_BASE_REGEX_PATTERNS = (r"^.+是什么[？?]?$", r"^什么是.+", r".+怎么理解[？?]?$")
 
@@ -126,7 +130,12 @@ def _looks_like_single_english_word(text: str) -> bool:
 
 
 def _looks_like_english_word_comparison(text: str) -> bool:
-    return bool(re.search(r"\b[a-z][a-z'-]+\s+和\s+[a-z][a-z'-]+\b.*(区别|辨析|不同)", text, re.I))
+    # 两个全大写缩写词（TCP 和 UDP）更像技术概念混淆，不算词汇辨析。
+    match = re.search(r"\b([A-Za-z][A-Za-z'-]+)\s+和\s+([A-Za-z][A-Za-z'-]+)\b.*(?:区别|辨析|不同)", text)
+    if not match:
+        return False
+    first, second = match.group(1), match.group(2)
+    return not (first.isupper() and second.isupper())
 
 
 def _explicit_skill(text: str) -> RouteResult | None:
@@ -156,7 +165,7 @@ def route(text: str) -> RouteResult:
 
     word_memory = _contains_any(normalized, WORD_MEMORY_KEYWORDS)
     is_single_word = _looks_like_single_english_word(text)
-    is_word_comparison = _looks_like_english_word_comparison(normalized)
+    is_word_comparison = _looks_like_english_word_comparison(text)
     if word_memory or is_single_word or is_word_comparison:
         rules = tuple(f"word:{m}" for m in word_memory)
         if is_single_word:
@@ -188,7 +197,7 @@ def route(text: str) -> RouteResult:
         return RouteResult("problem-solving", 0.9, tuple(f"problem:{m}" for m in problem_matches))
 
     fuzzy_matches = _contains_any(normalized, FUZZY_KEYWORDS)
-    if fuzzy_matches:
+    if fuzzy_matches and not _contains_any(normalized, FUZZY_CONFLICT_KEYWORDS):
         return RouteResult("fuzzy-understanding", 0.9, tuple(f"fuzzy:{m}" for m in fuzzy_matches))
 
     zero_matches = _contains_any(normalized, ZERO_BASE_KEYWORDS)
