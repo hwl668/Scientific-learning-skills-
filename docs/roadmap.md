@@ -20,7 +20,9 @@
 - [x] 本地实测（独立项目部署 + 模拟辅导会话）驱动修复：「背单词」「有什么区别」触发词、Memory CLI「当天到期」off-by-one、`setup.ps1`（Windows junction 部署）+ `learning-memory` PATH 兜底别名
 - [x] 分发升级：`.claude-plugin/plugin.json` + `marketplace.json`（一键插件安装）、`npx skills add` 入口、`deploy/zcode.md`；README 第一屏改为「诊断优先」slogan + 架构图
 - [x] LearningSkillBench v0.1 设计定稿（`docs/learning-skill-bench.md`：三条件对照 × 三层评测 + TER 靶向率）
-- [ ] **P1：实施 LearningSkillBench**——100 题数据集 + runner/judge/report 三件套，产出三条件对照表替换 README 证据段
+- [x] **P1：实施 LearningSkillBench**——`learning_agent/bench/`（runner/judge/report；Anthropic+OpenAI 兼容、断点续跑、mock 自检）+ 数据分层 `dev.synthetic.jsonl`(100) / `test.public.jsonl`(50，MathDial CC BY-SA 派生 half-real) + schema/路由门禁入 CI + 20 条 gold 标注
+- [x] 首次真实 pilot：20 case × 3 条件 ×（Level 2 judge + TER + Level 3 模拟学习者）→ `evals/bench/results/pilot20-v1.md`；README 证据段改为引用实测报告
+- [ ] v0.5 候选：放量 dev 全量 + public test；TER 人工 agreement 标注（30–50 条）；test.private holdout 解锁流程
 - [ ] 真机触发测试：8 个子 skill 的 description 在宿主中的触发/误触率
 - [ ] P2 候选：统一 learner state（跨 skill 学习者画像）、诊断六类扩成分类树 + 干预策略映射、学科误区包（subject packs）
 

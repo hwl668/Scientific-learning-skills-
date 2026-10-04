@@ -54,7 +54,7 @@ Windows 上如果 `python` 提示找不到（装完 Python 没重启终端），
 
 ## 2. 冒烟测试清单（12 条提示词，逐条粘贴）
 
-> 更多分类题目（含压力测试和学科事实抽查）见 [`test-questions.md`](./test-questions.md)；完整 100 题机器可读版在 `evals/bench/cases.v0.1.jsonl`。
+> 更多分类题目（含压力测试和学科事实抽查）见 [`test-questions.md`](./test-questions.md)；完整 100 题机器可读版在 `evals/bench/dev.synthetic.jsonl`。
 
 | # | 提示词 | 应该看到什么 |
 |---|--------|-------------|

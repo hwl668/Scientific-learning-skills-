@@ -28,6 +28,10 @@ jobs:
         run: python -B -m learning_agent.validate_skills
       - name: Validate routing-contract consistency
         run: python -B -m learning_agent.validate_routing
+      - name: Validate bench case files (schema + router agreement)
+        run: |
+          python -B -m learning_agent.bench.validate_cases --cases evals/bench/dev.synthetic.jsonl --min-routing-agreement 1.0
+          python -B -m learning_agent.bench.validate_cases --cases evals/bench/test.public.jsonl --min-routing-agreement 0.9
 
   eval-quick:
     name: Python & Eval (${{ matrix.python-version }})

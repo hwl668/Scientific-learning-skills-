@@ -43,3 +43,6 @@ memory/*/*.csv
 memory/*/*.md
 memory/*/*.bak
 !memory/review-engine.md
+
+# LearningSkillBench raw run outputs (only aggregate reports are committed)
+artifacts/bench/

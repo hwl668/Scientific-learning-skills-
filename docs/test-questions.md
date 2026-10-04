@@ -1,6 +1,6 @@
 # 测试题库（Test Question Bank）
 
-配合 `testing-guide.md` 使用。100 题完整版（含元数据）在 `evals/bench/cases.v0.1.jsonl`；这里按「测什么能力」挑出最有区分度的题目，直接复制粘贴即可。**测完请按 testing-guide 的反馈模板记录。**
+配合 `testing-guide.md` 使用。100 题完整版（含元数据）在 `evals/bench/dev.synthetic.jsonl`；这里按「测什么能力」挑出最有区分度的题目，直接复制粘贴即可。**测完请按 testing-guide 的反馈模板记录。**
 
 ---
 
