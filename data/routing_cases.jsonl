@@ -97,3 +97,4 @@
 {"text": "abundant 这个词怎么用？", "skill": "word-deep-dive", "category": "word", "from": "bench-v0.1"}
 {"text": "帮我背这段马原：物质决定意识，意识对物质具有能动的反作用。", "skill": "text-memorizer", "category": "text", "from": "bench-v0.1"}
 {"text": "六级还有 40 天，单词和听力怎么安排？", "skill": "study-plan-builder", "category": "plan", "from": "bench-v0.1"}
+{"text": "这道贝叶斯题：检测呈阳性时真正患病的概率，我算出 90% 但答案是 9%。这题该怎么做对？", "skill": "mistake-review", "category": "mistake", "from": "bench-v0.1"}
