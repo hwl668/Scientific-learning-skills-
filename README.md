@@ -32,7 +32,7 @@
   变式迁移（换条件还会做，才算真懂）──► 写入记忆，间隔复习
 ```
 
-9 个子 Skill 按**学习阶段**分工（而不是按学科堆数量）：零基础 / 模糊理解 / 深化 / 解题 / 错题 / 单词 / 背诵 / 计划，加 1 个路由总入口。配套确定性复习引擎（SM-2 风格间隔调度）和路由一致性 CI 门禁。
+8 个子 Skill 按**学习阶段**分工（而不是按学科堆数量）：零基础 / 模糊理解 / 深化 / 解题 / 错题 / 单词 / 背诵 / 计划，加 1 个统一路由入口 `scientific-learning`，共 9 个 Skill。配套确定性复习引擎（SM-2 风格间隔调度）和路由一致性 CI 门禁。
 
 ---
 
@@ -234,11 +234,12 @@ python -B -m learning_agent.eval.runner --suite evals/cases/smoke.jsonl --report
 | `demo/` + `eval.py` | 已签入示例是否含某些教学结构 | 模型在新问题上会稳定遵循 Skill |
 | 路由/诊断回归案例 | 当前规则在仓库内标签案例上是否回归 | 对新用户、新表达或新学科的泛化能力 |
 | Learned-router 训练/分组优先的合成 holdout（含已披露 fallback） | 合成数据上的基线与管道健康状态 | 真实流量准确率或教学效果 |
+| **LearningSkillBench pilot20-v1（真实模型三条件对照）** | 同一模型在 Base / Generic tutor / 本项目 Skill 三条件下，20 个带 gold 标注 case 上的 LLM-judge 质量分、TER 靶向率与模拟学习者后测（见 [`evals/bench/results/pilot20-v1.md`](./evals/bench/results/pilot20-v1.md)） | 真人学习效果（Level 3 是 `simulated-learner`）；judge 与被测同源（self-judge 已披露）；样本量小，只作方向性信号 |
 | 真实用户研究 | **尚未提供** | 学习成绩提升、迁移效果或长期保持 |
 
 Learned router 的训练报告应与数据集指纹、切分策略一起阅读。即使合成 holdout 上的指标很高，也不应写成“真实准确率 100%”或“已证明提升学习效果”。
 
-**下一阶段的目标是把证据升级为真实模型对照评测**（三条件：裸模型 / 通用家教提示 / 本项目 Skill × 三层指标：指令遵循 / LLM-as-judge 质量 / 模拟学习者后测增益 + TER 靶向率）。设计与运行协议见 [`docs/learning-skill-bench.md`](./docs/learning-skill-bench.md)；在该评测产出真实数据之前，本 README 不展示任何效果提升数字。
+**证据现状**：LearningSkillBench v0.1 已实施（`learning_agent/bench/` 的 runner / judge / report，prompt 冻结随 `run.json` 发布），并在 20 个 case 上产出了第一份真实模型三条件对照报告；数据分层与防污染约定见 [`docs/learning-skill-bench.md`](./docs/learning-skill-bench.md)。pilot 的诚实摘要：skills 条件在**变式迁移**（4.75 vs base 4.00）与**输出效率**（0.82×）上占优；其余 Level 2 维度受 judge 天花板与自评限制区分度不足，Level 3 后测存在天花板效应——详见报告及其「诚实边界」。除该报告明确标注的指标外，本 README 不展示任何效果提升数字；模拟学习者结果不等同于真实学习效果。
 
 安全模型格式、完整哈希、切分限制和适用边界见 [`artifacts/README.md`](./artifacts/README.md)。
 
@@ -252,6 +253,7 @@ python -B -m unittest discover -s tests
 python -B -m learning_agent.router --eval
 python -B -m learning_agent.diagnosis --eval
 python -B -m learning_agent.ml_router evaluate
+python -B -m learning_agent.bench.validate_cases
 python -B eval.py --quick
 python -B -m learning_agent.eval.runner --suite evals/cases/smoke.jsonl --report json
 ```

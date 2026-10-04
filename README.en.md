@@ -32,7 +32,7 @@
   Transfer task (changed conditions count as real understanding) ──► spaced review
 ```
 
-9 sub-skills split by **learning stage** (not by subject count): zero-base / fuzzy-understanding / deepening / problem-solving / mistake-review / word / memorization / study-plan, plus 1 routing entry. Ships with a deterministic SM-2-style review engine and a routing-consistency CI gate.
+8 sub-skills split by **learning stage** (not by subject count): zero-base / fuzzy-understanding / deepening / problem-solving / mistake-review / word / memorization / study-plan, plus 1 unified routing entry (`scientific-learning`) — 9 skills in total. Ships with a deterministic SM-2-style review engine and a routing-consistency CI gate.
 
 ---
 
@@ -193,9 +193,12 @@ Key datasets:
 | `demo/` + `eval.py` | Whether checked-in examples contain selected tutoring structures | Reliable Skill following on unseen prompts |
 | Router/diagnosis regression cases | Whether current rules regress on in-repo labeled cases | Generalization to new users, phrasing, or subjects |
 | Learned-router grouped-where-possible synthetic holdout (with disclosed fallback) | A synthetic-data baseline and pipeline health check | Accuracy on real traffic or tutoring effectiveness |
+| **LearningSkillBench pilot20-v1 (real-model three-condition comparison)** | Same model under Base / Generic tutor / these Skills on 20 gold-annotated cases: LLM-judge quality scores, TER, simulated-learner post-test (see [`evals/bench/results/pilot20-v1.md`](./evals/bench/results/pilot20-v1.md)) | Real-learner outcomes (Level 3 is `simulated-learner`); judge shares the subject model (self-judging disclosed); small sample — directional signal only |
 | Real-user study | **Not provided yet** | Learning gains, transfer, or long-term retention |
 
 Read learned-router metrics together with the dataset fingerprint and split strategy. A high synthetic-holdout score must not be described as "100% real-world accuracy" or evidence of improved learning outcomes.
+
+**Evidence status**: LearningSkillBench v0.1 is implemented (`learning_agent/bench/`: frozen-prompt runner / judge / report) and has produced a first real-model three-condition report on 20 cases. Dataset layering and contamination rules: [`docs/learning-skill-bench.md`](./docs/learning-skill-bench.md). Honest summary of the pilot: the Skills condition leads on **transfer** (4.75 vs base 4.00) and **output efficiency** (0.82×); other Level-2 dimensions are compressed by judge ceiling and self-judging, and Level-3 post-tests hit a ceiling — see the report and its honesty boundary. Beyond what that report explicitly states, this README shows no effectiveness numbers; simulated-learner results are not real learning outcomes.
 
 See [`artifacts/README.md`](./artifacts/README.md) for the safe format, hashes, split limitations, and intended-use boundary.
 
@@ -209,6 +212,7 @@ python -B -m unittest discover -s tests
 python -B -m learning_agent.router --eval
 python -B -m learning_agent.diagnosis --eval
 python -B -m learning_agent.ml_router evaluate
+python -B -m learning_agent.bench.validate_cases
 python -B eval.py --quick
 ```
 

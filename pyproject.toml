@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scientific-learning-skills"
-version = "0.3.0"
+version = "0.4.0"
 description = "Diagnosis-first agent skills and utilities for science and engineering learning"
 readme = "README.md"
 requires-python = ">=3.10"
