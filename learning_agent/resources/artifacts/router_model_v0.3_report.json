@@ -1,12 +1,12 @@
 {
   "artifact": {
     "format": "scientific-learning-router",
-    "path": "learning_agent/resources/artifacts/router_model_v0.3.json.gz",
+    "path": "artifacts/generated/router_model_v0.3.json.gz",
     "schema_version": 2,
-    "sha256": "ef8d6c2a235f8f4a161ebc2e30188ea170f5300aa4c6cea43009b8ac9bed3096"
+    "sha256": "a213861357c0cd738e6c67e0a79ccdf5c5db4ab9e3552ea7b4ac099911af1a52"
   },
   "dataset": "learning_agent/resources/data/training/router_training_v0.3.jsonl",
-  "dataset_sha256": "8c4bbc6efce6face1e16ad7ce7ca05bfe32aa4e99800f9b05d6a4f791d41cd09",
+  "dataset_sha256": "e66900995fe2815a81bfda28e2c6bffe4c0ab3c9872115e60161f42207fe7cb5",
   "dataset_total": 2231,
   "evaluation_scope": "offline synthetic holdout; not evidence of real-user generalization",
   "holdout_record_ids": [
