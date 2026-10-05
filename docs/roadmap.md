@@ -22,6 +22,7 @@
 - [x] LearningSkillBench v0.1 设计定稿（`docs/learning-skill-bench.md`：三条件对照 × 三层评测 + TER 靶向率）
 - [x] **P1：实施 LearningSkillBench**——`learning_agent/bench/`（runner/judge/report；Anthropic+OpenAI 兼容、断点续跑、mock 自检）+ 数据分层 `dev.synthetic.jsonl`(100) / `test.public.jsonl`(50，MathDial CC BY-SA 派生 half-real) + schema/路由门禁入 CI + 20 条 gold 标注
 - [x] 首次真实 pilot：20 case × 3 条件 ×（Level 2 judge + TER + Level 3 模拟学习者）→ `evals/bench/results/pilot20-v1.md`；README 证据段改为引用实测报告
+- [x] README 动态 demo：CSS 动画 SVG 分镜（`scripts/generate_demo_svg.py` + `docs/assets/demo-scenario.json`，zh/en × light/dark，reduced-motion 定格回退）+ bench-card.svg 由 `bench-card` workflow 从 `evals/bench/results/` 自动重渲（数字与已提交报告强一致，测试锁定）
 - [ ] v0.5 候选：放量 dev 全量 + public test；TER 人工 agreement 标注（30–50 条）；test.private holdout 解锁流程
 - [ ] 真机触发测试：8 个子 skill 的 description 在宿主中的触发/误触率
 - [ ] P2 候选：统一 learner state（跨 skill 学习者画像）、诊断六类扩成分类树 + 干预策略映射、学科误区包（subject packs）

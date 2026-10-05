@@ -9,6 +9,15 @@
 
 [中文版](./README.md)
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/demo-chat.en.dark.svg">
+    <img src="./docs/assets/demo-chat.en.light.svg" alt="Animated storyboard: the same question, a Generic Tutor explaining right away vs Scientific Learning Skills diagnosing first, repairing only the gap, then verifying and transferring" width="760">
+  </picture>
+</p>
+
+> 🎞 The animation above is a repo-authored **behavior illustration** (storyboard — not model output, not experimental data). The real three-condition comparison (LearningSkillBench pilot20-v1) lives in [`evals/bench/results/pilot20-v1.md`](./evals/bench/results/pilot20-v1.md).
+
 ---
 
 ## One tutoring methodology, not a prompt pile
@@ -197,6 +206,15 @@ Key datasets:
 | Real-user study | **Not provided yet** | Learning gains, transfer, or long-term retention |
 
 Read learned-router metrics together with the dataset fingerprint and split strategy. A high synthetic-holdout score must not be described as "100% real-world accuracy" or evidence of improved learning outcomes.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/bench-card.dark.svg">
+    <img src="./docs/assets/bench-card.light.svg" alt="LearningSkillBench pilot20-v1: real three-condition bars for transfer, TER, and output tokens" width="760">
+  </picture>
+</p>
+
+> The card above is rendered by the [`bench-card` workflow](./.github/workflows/bench-card.yml) from `evals/bench/results/`, so its numbers always match the committed report; honesty boundaries and per-metric interpretation live in that run's `report.md` and [`docs/learning-skill-bench.md`](./docs/learning-skill-bench.md).
 
 **Evidence status**: LearningSkillBench v0.1 is implemented (`learning_agent/bench/`: frozen-prompt runner / judge / report) and has produced a first real-model three-condition report on 20 cases. Dataset layering and contamination rules: [`docs/learning-skill-bench.md`](./docs/learning-skill-bench.md). Honest summary of the pilot: the Skills condition leads on **transfer** (4.75 vs base 4.00) and **output efficiency** (0.82×); other Level-2 dimensions are compressed by judge ceiling and self-judging, and Level-3 post-tests hit a ceiling — see the report and its honesty boundary. Beyond what that report explicitly states, this README shows no effectiveness numbers; simulated-learner results are not real learning outcomes.
 

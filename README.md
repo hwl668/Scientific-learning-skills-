@@ -9,6 +9,15 @@
 
 [Quick Start](#快速开始) · [Demo](./demo/) · [证据](#证据边界与本地验证) · [设计对比](#设计对比示例) · [测试指南](./docs/testing-guide.md) · [English](./README.en.md)
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/demo-chat.zh.dark.svg">
+    <img src="./docs/assets/demo-chat.zh.light.svg" alt="动态示意：同一个问题，Generic Tutor 直接开讲 vs Scientific Learning Skills 先诊断、只修卡点、再验证迁移" width="760">
+  </picture>
+</p>
+
+> 🎞 上图为 repo-authored **行为示意**（分镜演示，非模型输出、非实验数据）。真实三条件对照（LearningSkillBench pilot20-v1）见 [`evals/bench/results/pilot20-v1.md`](./evals/bench/results/pilot20-v1.md)。
+
 ---
 
 ## 一套教学法，不是一个 Prompt 堆
@@ -238,6 +247,15 @@ python -B -m learning_agent.eval.runner --suite evals/cases/smoke.jsonl --report
 | 真实用户研究 | **尚未提供** | 学习成绩提升、迁移效果或长期保持 |
 
 Learned router 的训练报告应与数据集指纹、切分策略一起阅读。即使合成 holdout 上的指标很高，也不应写成“真实准确率 100%”或“已证明提升学习效果”。
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/bench-card.dark.svg">
+    <img src="./docs/assets/bench-card.light.svg" alt="LearningSkillBench pilot20-v1：三条件在变式迁移、TER 与输出 token 上的真实对照条形图" width="760">
+  </picture>
+</p>
+
+> 上图由 [`bench-card` workflow](./.github/workflows/bench-card.yml) 从 `evals/bench/results/` 自动渲染，数字始终与已提交报告一致；诚实边界与逐项解读见该 run 的 `report.md` 与 [`docs/learning-skill-bench.md`](./docs/learning-skill-bench.md)。
 
 **证据现状**：LearningSkillBench v0.1 已实施（`learning_agent/bench/` 的 runner / judge / report，prompt 冻结随 `run.json` 发布），并在 20 个 case 上产出了第一份真实模型三条件对照报告；数据分层与防污染约定见 [`docs/learning-skill-bench.md`](./docs/learning-skill-bench.md)。pilot 的诚实摘要：skills 条件在**变式迁移**（4.75 vs base 4.00）与**输出效率**（0.82×）上占优；其余 Level 2 维度受 judge 天花板与自评限制区分度不足，Level 3 后测存在天花板效应——详见报告及其「诚实边界」。除该报告明确标注的指标外，本 README 不展示任何效果提升数字；模拟学习者结果不等同于真实学习效果。
 
