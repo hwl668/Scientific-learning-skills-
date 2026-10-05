@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "comment": "Storyboard for the README demo animation (scripts/generate_demo_svg.py). Repo-authored behavior illustration — NOT model output, NOT experimental data. Line length limits: zh <= 22 chars/line, en line1 <= 44 chars / line2 <= 44 chars (10.5px in a 300px column).",
+  "duration_s": 16.0,
+  "timings_s": {
+    "query_typewriter_start": 0.4,
+    "query_typewriter_end": 2.4,
+    "badge": 2.5,
+    "left_bubbles": [2.8, 3.6, 4.4, 5.2, 6.0, 6.8],
+    "left_bar": [2.8, 9.0],
+    "right_steps": [2.7, 3.5, 4.4, 5.6, 6.8, 8.0],
+    "right_bar": [2.7, 9.6],
+    "phase_lit": {"diagnose": 3.5, "intervene": 5.6, "verify": 6.9, "transfer": 8.1},
+    "token_values": 9.8,
+    "tagline": 10.4
+  },
+  "locales": {
+    "zh": {
+      "title": "同一个问题，两种回答",
+      "corner_tag": "行为示意 · 非实验数据",
+      "query": "我会算矩阵乘法，但不知道这一堆乘加在干什么。",
+      "badge": "router → fuzzy-understanding · 卡点：表征缺失",
+      "left_title": "Generic Tutor",
+      "left_sub": "直接开讲",
+      "right_title": "Scientific Learning Skills",
+      "right_sub": "先诊断",
+      "generic_bubbles": [
+        {"lines": ["矩阵就是按行列排布的数表，", "先从定义说起……"], "hit": false},
+        {"lines": ["乘法规则是行乘列再求和，", "我给你展开写一遍……"], "hit": false},
+        {"lines": ["它满足结合律、左分配律，", "单位阵是恒等变换……"], "hit": false},
+        {"lines": ["来，我们完整算一道 3×3 例题："], "hit": true},
+        {"lines": ["矩阵在图形学、机器学习里", "应用非常广泛……"], "hit": false},
+        {"lines": ["接下来讲特征值、SVD 和正交化，", "先记住公式……"], "hit": false}
+      ],
+      "skills_steps": [
+        {"phase": "diagnose", "lines": ["你算矩阵×向量时，心里把那串", "「乘加」理解成什么？"]},
+        {"phase": "diagnose", "lines": ["诊断：算法会，缺的是「矩阵 =", "线性变换」这层表征——只修这一处。"]},
+        {"phase": "intervene", "lines": ["矩阵 = 对空间的变换；矩阵×向量 =", "变换基向量，再按坐标合成。"]},
+        {"phase": "verify", "lines": ["自测：为什么一般情况下 AB ≠ BA？", "用「变换复合」说一句试试。"]},
+        {"phase": "transfer", "lines": ["变式：先旋转再拉伸 vs 先拉伸再旋转，", "终点一样吗？换条件还会做才算懂。"]}
+      ],
+      "phase_labels": {"diagnose": "诊断", "intervene": "干预", "verify": "验证", "transfer": "迁移"},
+      "token_label_left": "Generic tutor",
+      "token_label_right": "Skills",
+      "token_value_left": "1.0×",
+      "token_value_right": "0.6×",
+      "tagline": "讲得少一点 · 命中多一点"
+    },
+    "en": {
+      "title": "One question, two tutors",
+      "corner_tag": "storyboard demo · not experimental data",
+      "query": "I can compute matrix products, but I have no idea what all that multiply-and-add is doing.",
+      "badge": "router → fuzzy-understanding · gap: representation",
+      "left_title": "Generic Tutor",
+      "left_sub": "explains right away",
+      "right_title": "Scientific Learning Skills",
+      "right_sub": "diagnoses first",
+      "generic_bubbles": [
+        {"lines": ["A matrix is a rectangular array of numbers —", "let me start with the definition…"], "hit": false},
+        {"lines": ["Multiplication is row-by-column; sum products.", "I'll write it out for you…"], "hit": false},
+        {"lines": ["It's associative, distributive; the identity", "matrix acts like the number 1…"], "hit": false},
+        {"lines": ["Here, let me work a full 3×3 example:"], "hit": true},
+        {"lines": ["Matrices are everywhere — graphics,", "machine learning, physics…"], "hit": false},
+        {"lines": ["Next: eigenvalues, SVD, orthogonality —", "just memorize these formulas…"], "hit": false}
+      ],
+      "skills_steps": [
+        {"phase": "diagnose", "lines": ["When you multiply a matrix by a vector,", "what do you picture that multiply-add doing?"]},
+        {"phase": "diagnose", "lines": ["Diagnosis: algorithm fine; the missing", "piece is \"matrix = transformation\"."]},
+        {"phase": "intervene", "lines": ["A matrix transforms space; M·v = transform", "the basis vectors, then recombine."]},
+        {"phase": "verify", "lines": ["Self-check: why is AB ≠ BA in general?", "Try explaining with \"composition\"."]},
+        {"phase": "transfer", "lines": ["Variation: rotate-then-stretch vs the reverse —", "same endpoint? Transfer proves mastery."]}
+      ],
+      "phase_labels": {"diagnose": "Diagnose", "intervene": "Repair", "verify": "Verify", "transfer": "Transfer"},
+      "token_label_left": "Generic tutor",
+      "token_label_right": "Skills",
+      "token_value_left": "1.0×",
+      "token_value_right": "0.6×",
+      "tagline": "Say less. Hit more."
+    }
+  }
+}
