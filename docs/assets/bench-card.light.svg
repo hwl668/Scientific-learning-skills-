@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 336" width="760" height="336" role="img" aria-label="LearningSkillBench three-condition comparison">
+<style>text{font-family:-apple-system,'Segoe UI','Noto Sans SC','Microsoft YaHei',sans-serif}</style>
+<rect x="0" y="0" width="760" height="336" rx="12" fill="#ffffff" stroke="#d5d9df"/>
+<text x="28" y="34" font-size="15" font-weight="700" fill="#1f2328">LearningSkillBench · pilot20-v1</text>
+<text x="28" y="53" font-size="10.5" fill="#656d76">真实模型三条件对照 · 20 cases · subject=deepseek-v4-pro[1m] · judge=deepseek-v4-pro (self)</text>
+<text x="28" y="84" font-size="11" font-weight="700" fill="#1f2328">变式迁移 Transfer (1–5)</text>
+<text x="34" y="90" font-size="9.5" fill="#656d76">Base</text>
+<rect x="240" y="80" width="330" height="12" rx="6" fill="#f6f8fa" stroke="#d5d9df"/>
+<rect x="240" y="80" width="264.0" height="12" rx="6" fill="#8c959f"/>
+<text x="580" y="90" font-size="10.5" font-weight="700" fill="#8c959f">4.00</text>
+<text x="34" y="110" font-size="9.5" fill="#656d76">Generic tutor</text>
+<rect x="240" y="100" width="330" height="12" rx="6" fill="#f6f8fa" stroke="#d5d9df"/>
+<rect x="240" y="100" width="293.7" height="12" rx="6" fill="#656d76"/>
+<text x="580" y="110" font-size="10.5" font-weight="700" fill="#656d76">4.45</text>
+<text x="34" y="130" font-size="9.5" fill="#656d76">Scientific Learning Skills</text>
+<rect x="240" y="120" width="330" height="12" rx="6" fill="#f6f8fa" stroke="#d5d9df"/>
+<rect x="240" y="120" width="313.5" height="12" rx="6" fill="#0969da"/>
+<text x="580" y="130" font-size="10.5" font-weight="700" fill="#0969da">4.75</text>
+<text x="28" y="156" font-size="11" font-weight="700" fill="#1f2328">TER 靶向解释率</text>
+<text x="34" y="162" font-size="9.5" fill="#656d76">Base</text>
+<rect x="240" y="152" width="330" height="12" rx="6" fill="#f6f8fa" stroke="#d5d9df"/>
+<rect x="240" y="152" width="313.5" height="12" rx="6" fill="#8c959f"/>
+<text x="580" y="162" font-size="10.5" font-weight="700" fill="#8c959f">0.95</text>
+<text x="34" y="182" font-size="9.5" fill="#656d76">Generic tutor</text>
+<rect x="240" y="172" width="330" height="12" rx="6" fill="#f6f8fa" stroke="#d5d9df"/>
+<rect x="240" y="172" width="316.8" height="12" rx="6" fill="#656d76"/>
+<text x="580" y="182" font-size="10.5" font-weight="700" fill="#656d76">0.96</text>
+<text x="34" y="202" font-size="9.5" fill="#656d76">Scientific Learning Skills</text>
+<rect x="240" y="192" width="330" height="12" rx="6" fill="#f6f8fa" stroke="#d5d9df"/>
+<rect x="240" y="192" width="306.9" height="12" rx="6" fill="#0969da"/>
+<text x="580" y="202" font-size="10.5" font-weight="700" fill="#0969da">0.93</text>
+<text x="28" y="228" font-size="11" font-weight="700" fill="#1f2328">输出 tokens (×base)</text>
+<text x="34" y="234" font-size="9.5" fill="#656d76">Base</text>
+<rect x="240" y="224" width="330" height="12" rx="6" fill="#f6f8fa" stroke="#d5d9df"/>
+<rect x="240" y="224" width="330.0" height="12" rx="6" fill="#8c959f"/>
+<text x="580" y="234" font-size="10.5" font-weight="700" fill="#8c959f">1.00</text>
+<text x="34" y="254" font-size="9.5" fill="#656d76">Generic tutor</text>
+<rect x="240" y="244" width="330" height="12" rx="6" fill="#f6f8fa" stroke="#d5d9df"/>
+<rect x="240" y="244" width="214.5" height="12" rx="6" fill="#656d76"/>
+<text x="580" y="254" font-size="10.5" font-weight="700" fill="#656d76">0.65</text>
+<text x="34" y="274" font-size="9.5" fill="#656d76">Scientific Learning Skills</text>
+<rect x="240" y="264" width="330" height="12" rx="6" fill="#f6f8fa" stroke="#d5d9df"/>
+<rect x="240" y="264" width="270.6" height="12" rx="6" fill="#0969da"/>
+<text x="580" y="274" font-size="10.5" font-weight="700" fill="#0969da">0.82</text>
+<text x="28" y="320" font-size="9.5" fill="#656d76">simulated-learner ≠ 真实学习效果 · LLM-as-judge（自评，天花板压缩区分度） · Level 3 后测三条件 100%（天花板效应）</text>
+<text x="28" y="306" font-size="9.5" fill="#656d76">数字只来自 evals/bench/results/ 已提交报告 · 由 bench-card workflow 自动刷新 · 详见该 run 的 report.md</text>
+</svg>
