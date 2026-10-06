@@ -135,6 +135,15 @@ study-plan-builder 发现"用户对自己的基础判断有误"
 |------|-----------|---------|---------|
 | **分析记忆** | zero-base-learning, fuzzy-understanding, deepening-learning, problem-solving, mistake-review, study-plan-builder | 教学过程的洞察：什么解释方式有效、常见卡点模式、易错题型特征 | `memory/{skill-name}/` |
 | **内容记忆** | word-deep-dive, text-memorizer | 具体学习内容（单词、文本知识点）+ 间隔复习状态 | `memory/{skill-name}/` |
+| **Learner state（跨技能共享）** | 诊断类 Skill（fuzzy-understanding 优先） | 知识点 × 卡点类型 × 已用修复策略 × 验证结果 | `memory/learner-state.json` |
+
+### 跨轮 Learner State（轻量）
+
+诊断类 Skill 在诊断前先查 `python -m learning_agent.memory.learner_state get --topic <主题>`：
+该主题已有**未验证**卡点 → 从上次策略直接恢复，不重走完整诊断；已验证 → 只确认迁移。
+每次会话结束 `record --topic <主题> --gap <六类之一> --strategy <策略> --verified <true|false>`。
+边界：这是确定性小表格，只保证"同一主题不重复从零诊断"，不是知识追踪模型，不声称
+建模学习者全部状态。宿主无 Python 时跳过此环节，回退到常规诊断流程。
 
 ### 共享复习引擎
 

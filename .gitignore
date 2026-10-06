@@ -46,3 +46,7 @@ memory/*/*.bak
 
 # LearningSkillBench raw run outputs (only aggregate reports are committed)
 artifacts/bench/
+
+# Learner state (privacy — user diagnosis history)
+memory/learner-state.json
+memory/learner-state.json.bak

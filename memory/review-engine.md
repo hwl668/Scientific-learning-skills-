@@ -29,6 +29,27 @@ python -m learning_agent.memory.cli remove --skill word-deep-dive --id complimen
 
 CLI 的存储位置与下文一致（`memory/{skill-name}/`），默认相对当前目录，可用 `--memory-root` 指定。写入是原子操作并自动保留 `.bak` 备份；遇到损坏的记忆文件会报错退出而不是当成空库覆盖。
 
+## 跨轮 Learner State（诊断类 Skill 共享）
+
+与间隔复习无关的**跨轮学习者状态**（知识点 × 卡点 × 已用策略 × 验证结果）由独立 CLI 管理，
+fuzzy-understanding 等诊断类 Skill 在诊断前读取、会话结束时写入：
+
+```bash
+# 记录一次卡点观察（同主题同卡点幂等累加；verified 标记变式验证是否通过）
+python -m learning_agent.memory.learner_state record --topic 矩阵乘法 \
+    --gap formula_without_understanding --strategy "基向量变换类比" --verified false
+
+# 诊断前读取：已有未验证卡点 → 从上次策略恢复，不重走完整诊断
+python -m learning_agent.memory.learner_state get --topic 矩阵乘法
+
+# 摘要 / 清除（--json 机器可读）
+python -m learning_agent.memory.learner_state list
+python -m learning_agent.memory.learner_state clear --topic 矩阵乘法
+```
+
+存储在 `memory/learner-state.json`，与复习记忆相同的原子写 + `.bak` + 损坏报错契约；
+`--gap` 只接受 `learning_agent/diagnosis.py` 的六类闭集标签。
+
 ## 存储格式
 
 各 Skill 在自己的 `memory/{skill-name}/` 下存储数据。每条记忆记录必须包含以下字段：
