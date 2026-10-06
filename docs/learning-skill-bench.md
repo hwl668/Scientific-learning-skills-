@@ -8,19 +8,30 @@
 
 ## 0. 实施状态
 
+> **v2 协议（2026-10-06）**：针对 pilot20-v1 暴露的两个问题做了修订——
+> ① Skills 条件在 Relevance（4.20 vs 4.65）与 Cognitive load（3.75 vs 4.55）上输给
+> generic tutor，诊断成了「前置税」→ 修 SKILL.md/RULES.md（诊断预算：最多 1 个带假设的
+> 问题；初学者信号出现则 0 个；输出只服务当前卡点）后重跑；
+> ② Level 3 三条件后测全 100%（天花板）→ 后测全部加难为多步应用/预测题 +
+> 模拟学习者换用更弱模型（`--learner-model deepseek-chat`，教学轮仍为被测模型）。
+> 同时吸收调研的 MRBench 维度：judge V2 新增 **Mistake Location** 与 **No-reveal**，
+> 并引入 `student_level`（low/mid/high）**分层报告**——同一诊断对初学者有害的风险
+> （McMiner：+15.9pp / −12.2pp）不允许被平均分掩盖。
+
 | 组件 | 状态 | 位置 |
 |---|---|---|
-| 三条件对照设计 | ✅ 定稿 | 本文件 §1 |
+| 三条件对照设计 | ✅ 定稿（v2 协议） | 本文件 §1/§3 |
 | dev 集（100 synthetic，兼 router 回归集） | ✅ | `evals/bench/dev.synthetic.jsonl` |
 | public test 集（50 half-real，源自 MathDial CC BY-SA 4.0） | ✅ | `evals/bench/test.public.jsonl`（生成器 `scripts/build_test_public.py`） |
 | private holdout | ⬜ 保留位（不入库） | 见 §2 末尾 |
 | schema + 路由一致性门禁（CI） | ✅ | `python -m learning_agent.bench.validate_cases` |
-| gold 标注（20 条 pilot：诊断 / must_address / must_not_do；其中 17 条含后测） | ✅ | dev 文件 `gold` / `post_test` 字段 |
-| runner（三条件生成；Anthropic/OpenAI 兼容；断点续跑；mock 模式） | ✅ | `learning_agent/bench/runner.py` |
-| judge（Level 2 七维 1–5 + TER 原子单元标注 + Level 3 后测判分） | ✅ | `learning_agent/bench/judge.py` |
-| report（聚合表 + 诚实边界声明，聚合结果可入库） | ✅ | `learning_agent/bench/report.py` |
-| 冻结 prompt（generic-tutor / judge / learner，sha256 指纹随 run.json 发布） | ✅ | `learning_agent/bench/prompts.py` |
-| 首次真实 pilot（20 case × 3 条件 + 模拟学习者） | ✅ | `evals/bench/results/pilot20-v1.md` |
+| gold 标注（20 条 pilot：诊断 / must_address / must_not_do；其中 17 条含加难后测） | ✅ v2 | dev 文件 `gold` / `post_test` / `student_level` 字段 |
+| runner（三条件生成；独立学习者模型；断点续跑；mock 模式） | ✅ | `learning_agent/bench/runner.py` |
+| judge（Level 2 九维 1–5 + TER 原子单元标注 + Level 3 后测判分） | ✅ V2 | `learning_agent/bench/judge.py` |
+| report（聚合表 + student_level 分层 + 诚实边界声明） | ✅ | `learning_agent/bench/report.py` |
+| 冻结 prompt（generic-tutor / judge V2 / learner，sha256 指纹随 run.json 发布） | ✅ | `learning_agent/bench/prompts.py` |
+| 首次真实 pilot（pilot20-v1，存档对照） | ✅ | `evals/bench/results/pilot20-v1.md` |
+| v2 pilot（诊断预算修复验证） | ✅ | `evals/bench/results/pilot20-v2.md` |
 
 ### 数据分层与防污染
 

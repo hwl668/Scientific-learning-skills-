@@ -46,3 +46,33 @@
 {"text":"我会套最小二乘公式，但不知道为什么平方误差要最小。","label":"formula_without_understanding","category":"formula"}
 {"text":"我只会算矩阵特征值，不知道它为什么有意义。","label":"formula_without_understanding","category":"formula"}
 {"text":"泰勒公式我会用，但不知道为什么可以用多项式近似函数。","label":"formula_without_understanding","category":"formula"}
+{"text": "这道题我选了 B，把协方差的取值当成了相关系数的取值范围，答案是 -1 到 1 我写了任意实数。这两个概念的区别到底在哪？", "label": "concept_confusion", "category": "distractor"}
+{"text": "我把 TCP 拥塞控制当成了流量控制去选选项被判错。拥塞控制和流量控制什么时候用哪个？", "label": "concept_confusion", "category": "distractor"}
+{"text": "题目问的是字符串常量，我按字符数组的方式答了被扣分。字符串和字符数组我到现在都分不清。", "label": "concept_confusion", "category": "distractor"}
+{"text": "这题 f 在 x=0 处有极限，我选了「连续」，答案是「不连续」。极限和连续的区别我背过还是选错。", "label": "concept_confusion", "category": "distractor"}
+{"text": "单例模式那道题我用混了静态类和单例，选了错误的选项。它们到底什么时候用哪个？", "label": "concept_confusion", "category": "distractor"}
+{"text": "|A| 我一直当成绝对值来算，这道线代题从第一步就全错了。竖线包着矩阵是什么意思？", "label": "symbol_not_understood", "category": "distractor"}
+{"text": "题目里的 ∀x 我直接忽略掉了，「任意」相关的选项全没考虑所以选错。这个符号到底在约束什么？", "label": "symbol_not_understood", "category": "distractor"}
+{"text": "我把 f'(x) 读成 f 乘 x，整道求导题全错。这个撇记号是什么意思？", "label": "symbol_not_understood", "category": "distractor"}
+{"text": "∑ 的上标 n 和下标 i=1 我只代入了最后一项所以全错。这个求和符号的下标上标到底怎么读？", "label": "symbol_not_understood", "category": "distractor"}
+{"text": "看到 ∃! 我以为是印刷错误，这题的逻辑选项直接跳过选错。这个符号是什么意思？", "label": "symbol_not_understood", "category": "distractor"}
+{"text": "答案里从 x²+y²=r² 直接跳到 2x+2yy'=0，我抄下来了但没看懂这一步怎么得到的。", "label": "derivation_gap", "category": "distractor"}
+{"text": "标准答案用了洛必达之后还变了一次形，我代进去数值对不上，中间哪一步断了？", "label": "derivation_gap", "category": "distractor"}
+{"text": "这题我能看懂最后一行结论，但第 2 行到第 3 行的等号怎么来的完全看不出来。", "label": "derivation_gap", "category": "distractor"}
+{"text": "证明第二行突然出现了一个构造的辅助函数，答案说「显然可得」，我不知道它是从哪来的。", "label": "derivation_gap", "category": "distractor"}
+{"text": "参考答案把 x_{n+1} 写成 x_n 的极限 L，下一步两边同时取极限，我不明白这个等号两边怎么变成相等的。", "label": "derivation_gap", "category": "distractor"}
+{"text": "这道题做错是因为我根本不知道「特征值」是什么，前面的矩阵课都没听。我应该先补什么？", "label": "missing_prerequisite", "category": "distractor"}
+{"text": "老师批注说我错在没有学过行列式的性质就直接用克拉默法则。这种前置缺口我要怎么判断？", "label": "missing_prerequisite", "category": "distractor"}
+{"text": "选项里所有涉及「秩」的判断我全选错，后来发现是秩的概念缺失导致整道题的解析我都听不懂。", "label": "missing_prerequisite", "category": "distractor"}
+{"text": "这道递归题卡住是因为我连函数调用栈是什么都不知道，这部分基础没学。要先学什么？", "label": "missing_prerequisite", "category": "distractor"}
+{"text": "题目默认会画状态转移图，我没学过自动机，从读题开始就懵了。这是不是前置问题？需要补什么？", "label": "missing_prerequisite", "category": "distractor"}
+{"text": "例题里的追及问题我会做，考试把火车换成传送带我选择的公式就错了。为什么一换场景就不会？", "label": "rote_no_transfer", "category": "distractor"}
+{"text": "老师讲的那道例题我抄会了，作业把条件换个方向我就选错。怎么才算会而不是背模板？", "label": "rote_no_transfer", "category": "distractor"}
+{"text": "课上用数组讲的双指针我懂了，题目换成链表就不会迁移，选项全错。", "label": "rote_no_transfer", "category": "distractor"}
+{"text": "这道题和我背过的题型只差「至少」变成了「至多」，我就把判断方向选反了。遇到变式就不行。", "label": "rote_no_transfer", "category": "distractor"}
+{"text": "参考例题我一步没差地复现出来了，考试只改了提问方向我就卡住。这种照着会、自己做不会怎么破？", "label": "rote_no_transfer", "category": "distractor"}
+{"text": "这题我套公式把两个概率直接相加了，正确答案要先算交集项。P(A∪B)=P(A)+P(B) 这个公式为什么不能随便用？", "label": "formula_without_understanding", "category": "distractor"}
+{"text": "我把等比数列求和公式用在公比等于 1 的题上选错了。这个公式背后为什么不许 q=1？", "label": "formula_without_understanding", "category": "distractor"}
+{"text": "洛必达我每道题都在用，这题是 x→∞ 的 0/0 型我代错了。我只会算，不会判断它什么时候不能用。", "label": "formula_without_understanding", "category": "distractor"}
+{"text": "我用求导公式直接令导数为零，答案说要再检验边界点。公式不管边界吗？我背了公式但不知道原理。", "label": "formula_without_understanding", "category": "distractor"}
+{"text": "标准差公式我代数字很熟练，这道题的数据是加权样本我直接代错。公式背后的原理对数据有什么要求？", "label": "formula_without_understanding", "category": "distractor"}
