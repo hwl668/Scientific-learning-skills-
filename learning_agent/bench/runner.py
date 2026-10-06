@@ -218,6 +218,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--max-tokens", type=int, default=16384, help="per-call output budget; reasoning models spend it on thinking + answer")
     parser.add_argument("--with-learner", action="store_true", help="also run the Level 3 simulated-learner stage")
     parser.add_argument("--mock", action="store_true", help="offline mock client; output marked mock, not evidence")
+    parser.add_argument("--yes", action="store_true",
+                        help="authorize billable API spend for this invocation (required unless --mock)")
     args = parser.parse_args(argv)
 
     conditions = [c.strip() for c in args.conditions.split(",") if c.strip()]
@@ -278,6 +280,27 @@ def main(argv: list[str] | None = None) -> int:
 
     done = existing_keys(responses_path)
     todo = [(case_id, condition) for case_id in cases for condition in conditions if (case_id, condition) not in done]
+
+    # Spend gate: real API calls cost the account owner money. Never spend without
+    # an explicit --yes for this invocation; mock runs are free and exempt.
+    if not args.mock and client.protocol != "mock":
+        learner_calls = 0
+        if args.with_learner:
+            learner_done = existing_keys(run_dir / "learner.jsonl")
+            learner_todo = [r for r in existing_keys(responses_path) if r not in learner_done]
+            learner_calls = len(learner_todo) * 2 + sum(
+                1 for case_id, _condition in learner_todo if cases.get(case_id, {}).get("post_test")
+            )
+        estimate = len(todo) + learner_calls
+        print(
+            f"SPEND GATE: this run would issue up to ~{estimate} billable API calls "
+            f"(teaching {len(todo)}, learner stage {learner_calls}) on model {client.model}. "
+            f"Re-run with --yes to confirm you authorize this spend."
+        )
+        if not args.yes:
+            print("Aborted without spending. Nothing was written.")
+            return 2
+
     print(
         f"run {args.run_id}: {len(cases)} cases x {len(conditions)} conditions "
         f"({len(todo)} to run, {len(done)} already done), provider={client.protocol}, model={client.model}"

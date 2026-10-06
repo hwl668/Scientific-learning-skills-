@@ -159,6 +159,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--model", help="judge model override (default: BENCH_MODEL / provider default)")
     parser.add_argument("--max-tokens", type=int, default=16384, help="judge output budget; reasoning models need headroom")
     parser.add_argument("--mock", action="store_true")
+    parser.add_argument("--yes", action="store_true",
+                        help="authorize billable API spend for this invocation (required unless --mock)")
     args = parser.parse_args(argv)
 
     if not args.run_dir and not args.run_id:
@@ -196,6 +198,31 @@ def main(argv: list[str] | None = None) -> int:
 
     records = [json.loads(line) for line in responses_path.open(encoding="utf-8") if line.strip()]
     todo = [r for r in records if (r["case_id"], r["condition"]) not in done]
+
+    # Spend gate: judging bills the account owner; require explicit --yes.
+    if not args.mock and client.protocol != "mock":
+        learner_path = run_dir / "learner.jsonl"
+        learner_pairs: set[tuple[str, str]] = set()
+        if learner_path.exists():
+            for line in learner_path.open(encoding="utf-8"):
+                line = line.strip()
+                if line:
+                    record = json.loads(line)
+                    learner_pairs.add((record["case_id"], record["condition"]))
+        post_test_calls = sum(
+            1 for r in todo
+            if (r["case_id"], r["condition"]) in learner_pairs and (cases.get(r["case_id"], {}).get("post_test"))
+        )
+        estimate = len(todo) + post_test_calls
+        print(
+            f"SPEND GATE: judging would issue up to ~{estimate} billable API calls "
+            f"(L2 {len(todo)}, post-test grading {post_test_calls}) on model {client.model}. "
+            f"Re-run with --yes to confirm you authorize this spend."
+        )
+        if not args.yes:
+            print("Aborted without spending. Nothing was written.")
+            return 2
+
     print(
         f"judging run {args.run_id}: {len(todo)} to judge, {len(done)} already done, "
         f"judge model={client.model} (subject model={run_config.get('subject_model')})"
