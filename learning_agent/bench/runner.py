@@ -117,6 +117,7 @@ def existing_keys(responses_path: Path) -> set[tuple[str, str]]:
 
 def run_learner_stage(
     client,
+    learner_client,
     cases: dict[str, dict],
     responses_path: Path,
     out_path: Path,
@@ -131,6 +132,10 @@ def run_learner_stage(
     second turn given the answers, and only then takes the post-test. This
     measures the methodology's deployment shape instead of punishing
     diagnosis-first behavior for the single-turn format.
+
+    `client` is the SUBJECT model (drives turn-2 teaching); `learner_client`
+    plays the student (diagnostic answers + post-test). They may differ — a
+    weaker learner raises Level-3 discrimination on hard post-tests.
     """
 
     done = existing_keys(out_path)
@@ -152,7 +157,7 @@ def run_learner_stage(
             misconception=misconception,
             tutor_response=record["response_text"],
         )
-        diag = client.complete(LEARNER_DIAG_SYSTEM_PROMPT_V1, diag_user, max_tokens=max_tokens)
+        diag = learner_client.complete(LEARNER_DIAG_SYSTEM_PROMPT_V1, diag_user, max_tokens=max_tokens)
         learner_reply = diag["text"]
 
         system_prompt, _routed = get_system_prompt(case, record["condition"])
@@ -162,7 +167,6 @@ def run_learner_stage(
             learner_reply=learner_reply,
         )
         turn2 = client.complete(system_prompt, turn2_user, max_tokens=max_tokens)
-
         transcript = (
             f"[第一轮]\n{record['response_text']}\n\n"
             f"[学习者的回答]\n{learner_reply}\n\n"
@@ -183,7 +187,7 @@ def run_learner_stage(
                 teaching_transcript=transcript,
                 post_test_questions=build_post_test_questions(post_test),
             )
-            post = client.complete(LEARNER_POSTTEST_SYSTEM_PROMPT_V1, post_user, max_tokens=max_tokens)
+            post = learner_client.complete(LEARNER_POSTTEST_SYSTEM_PROMPT_V1, post_user, max_tokens=max_tokens)
             try:
                 parsed = parse_strict_json(post["text"])
             except ValueError:
@@ -204,6 +208,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--conditions", default=",".join(CONDITIONS), help=f"subset of {CONDITIONS}")
     parser.add_argument("--provider", choices=("anthropic", "openai", "mock"), help="default: auto-detect from env")
     parser.add_argument("--model", help="subject model override (default: BENCH_MODEL / provider default)")
+    parser.add_argument("--learner-model", help="simulated-learner model override; a WEAKER model raises Level-3 "
+                        "discrimination when post-tests hit a ceiling (default: same as subject)")
+    parser.add_argument("--learner-provider", choices=("anthropic", "openai", "mock"),
+                        help="provider for the simulated learner (default: same as --provider)")
     parser.add_argument("--judge-model", help="model name recorded for the (separate) judge step")
     parser.add_argument("--run-id", required=True, help="output directory name under artifacts/bench/")
     parser.add_argument("--out-root", type=Path, default=DEFAULT_OUTPUT_ROOT, help="override output root (for tests)")
@@ -251,6 +259,8 @@ def main(argv: list[str] | None = None) -> int:
         "provider": client.protocol,
         "subject_model": client.model,
         "judge_model": args.judge_model,
+        "learner_model": args.learner_model,
+        "learner_provider": args.learner_provider,
         "cases_file": str(args.cases),
         "cases_file_sha256": file_sha256(args.cases),
         "case_ids": sorted(cases),
@@ -302,8 +312,19 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[{index}/{len(todo)}] {case_id}/{condition}: ok ({result.get('output_tokens')} out-tokens)")
 
     if args.with_learner:
+        learner_client = client
+        learner_model_name = client.model
+        if args.learner_model or args.learner_provider:
+            learner_provider = args.learner_provider or provider
+            try:
+                learner_client = make_client(learner_provider, args.learner_model, mock=args.mock)
+                learner_model_name = learner_client.model
+            except APIError as exc:
+                print(f"ERROR learner client: {exc}", file=sys.stderr)
+                return 1
+            print(f"learner stage model: {learner_model_name} (subject: {client.model})")
         learner_path = run_dir / "learner.jsonl"
-        completed = run_learner_stage(client, cases, responses_path, learner_path, args.max_tokens)
+        completed = run_learner_stage(client, learner_client, cases, responses_path, learner_path, args.max_tokens)
         print(f"learner stage: {completed} new post-test answer sets -> {learner_path}")
 
     if failures:

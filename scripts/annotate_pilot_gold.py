@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
-"""Annotate the 20-case pilot subset of dev.synthetic.jsonl with gold + post_test.
+"""Annotate the 20-case pilot subset of dev.synthetic.jsonl (v2: harder post-tests + levels).
 
-Gold annotations are hand-authored by the maintainer following
-docs/learning-skill-bench.md: diagnosis = the gap a good tutor should find,
-must_address = content a good reply must cover, must_not_do = anti-patterns.
-post_test is used only when the simulated-learner stage is enabled; wd/tm/sp
-cases carry gold only (no meaningful isomorphic/near/far transfer tiers).
+v2 changes (driven by pilot20-v1's Level-3 ceiling — all three conditions scored
+100% on post-tests too easy for a strong simulated learner):
+- post_test items are now multi-step application/prediction tasks (compute,
+  predict, prove monotonicity) instead of "explain the idea" prompts;
+- every pilot case carries student_level (low/mid/high) so reports can stratify
+  and beginner-harm stays visible (McMiner: same prompt +15.9pp advanced,
+  −12.2pp beginners).
+
+Gold annotations (diagnosis / must_address / must_not_do) are hand-authored by
+the maintainer following docs/learning-skill-bench.md. wd/tm/sp carry gold only.
 """
 
 import json
@@ -15,6 +20,7 @@ PATH = Path(__file__).resolve().parents[1] / "evals" / "bench" / "dev.synthetic.
 
 GOLD = {
     "zb-001": {
+        "student_level": "low",
         "gold": {
             "skill": "zero-base-learning",
             "learner_state": "prior_missing",
@@ -31,20 +37,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "数列 aₙ = (n+1)/n，当 n 无限增大时它趋近于多少？这个趋势值和某一项的值必须相等吗？",
-                "reference_answer": "趋近于 1。趋势值是极限，不要求某一项等于它：每一项都大于 1，但随 n 增大无限逼近 1。",
+                "question": "数列 aₙ = n/(n+1)：算出 a₁、a₂、a₁₀、a₁₀₀ 的数值；它趋近于哪个数？a₁₀₀ 与极限值相差多少？由此说明「极限值不必等于任何一项」。",
+                "reference_answer": "a₁=1/2, a₂=2/3, a₁₀≈0.909, a₁₀₀≈0.990；极限是 1；差约 0.01；每一项都严格小于 1 且不等于 1，但无限逼近——极限值不要求被某一项取到。",
             },
             "near_transfer": {
-                "question": "一个人不断把剩余距离减半往前走（100 米、50 米、25 米……），用极限的语言描述他相对终点线的位置趋势。",
-                "reference_answer": "剩余距离趋于 0，位置的极限是终点线；极限描述的是无限逼近的趋势，并不要求过程在某一步真正到达。",
+                "question": "f(x)=x² 在 x→2 时极限是 4。若改成分段函数：x<2 时 f(x)=x²，但定义 f(2)=100。x→2 的极限还是 4 吗？为什么 f(2) 的取值不影响极限？",
+                "reference_answer": "仍是 4。极限只关心 x 趋近 2 时（x≠2）函数值的趋势，与该点本身的定义无关——所以 f(2)=100 不影响极限存在且为 4。",
             },
             "far_transfer": {
-                "question": "热水放在室温房间会越来越接近室温。这种「越来越接近一个固定值」的现象体现了什么数学思想？固定值是什么？",
-                "reference_answer": "体现了极限思想：水温这个量随时间变化的趋势有一个极限值，即室温；极限描述变化的目标趋势而非某一时刻的状态。",
+                "question": "有人说：「油量表读数越来越接近 0，所以油量的极限是 0，发动机此刻一定没油了。」指出这句话混淆了极限语言的哪两个概念。",
+                "reference_answer": "混淆了「趋近的极限值」与「某时刻的实际取值」。极限描述变化趋势，不保证在某一时刻真正达到该值——读数趋于 0 不等于此刻油量为 0。",
             },
         },
     },
     "zb-008": {
+        "student_level": "low",
         "gold": {
             "skill": "zero-base-learning",
             "learner_state": "prior_missing",
@@ -61,20 +68,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "写（或描述）一个计算 1+2+…+n 的递归函数：它的基线条件是什么？递归步骤是什么？",
-                "reference_answer": "基线条件：n=1（或 n=0）时返回 1（或 0）；递归步骤：f(n) = n + f(n-1)，每层把问题缩小后调用自己，返回值逐层相加回传。",
+                "question": "给出 2ⁿ 的递归定义（基线条件 + 递归步骤），并写出 f(4) 展开经历的每一层调用与最终返回值。",
+                "reference_answer": "基线 f(0)=1（或 f(1)=2）；递归 f(n)=2·f(n-1)。f(4)=2·f(3)→2·(2·f(2))→2·(2·(2·f(1)))→2·(2·(2·2))，逐层返回得 16，共 5 层调用。",
             },
             "near_transfer": {
-                "question": "用递归的思路描述：如何在一个嵌套的文件夹结构里统计所有文件的数量？（提示：文件夹里可能有子文件夹）",
-                "reference_answer": "基线：空文件夹或普通文件计 1/0；递归：对每个子文件夹调用同一统计函数，把各部分数量求和——结构自相似，函数调用自己处理子结构。",
+                "question": "写一个统计文件夹内所有文件数的伪代码 countFiles(folder)（文件夹可嵌套）：基线是什么？递归步骤是什么？如果忘了基线会发生什么？",
+                "reference_answer": "基线：folder 无子文件夹时返回其中文件数；递归：对本文件夹每个子文件夹调用 countFiles 并求和。没有基线 → 递归不终止，调用栈无限增长直至栈溢出。",
             },
             "far_transfer": {
-                "question": "俄罗斯套娃每打开一层里面还有一个更小的娃，最内层是实心的。这个比喻里「实心娃」和「打开动作」分别对应递归的哪两个要素？",
-                "reference_answer": "实心娃对应基线条件（不再继续调用的终止情形），打开动作对应递归步骤（把大问题拆成同样形式的小问题）。",
+                "question": "「先有鸡还是先有蛋」也是一种自我引用。递归为什么不是这种死循环？两者最关键的差异是什么（用「基线/规模」的语言）？",
+                "reference_answer": "递归每层把问题规模缩小（n→n-1），且存在一定能到达的基线出口；鸡生蛋问题没有缩小规模的机制、没有基线，自我引用不终止。",
             },
         },
     },
     "zb-014": {
+        "student_level": "low",
         "gold": {
             "skill": "zero-base-learning",
             "learner_state": "prior_missing",
@@ -91,20 +99,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "你在山上想走到谷底，但浓雾看不见全貌，只能感觉脚下哪边更陡。描述一个合理的下山策略，并指出它对应梯度下降的哪两个要素。",
-                "reference_answer": "策略：每次沿「下坡最陡」的方向走一小步，重复直到基本不再变低。对应：负梯度方向 = 下坡最陡方向；学习率 = 每步的步长。",
+                "question": "在 f(w)=(w-3)² 上从 w=0 出发，学习率 η=0.2。算出前两步更新后的 w 值（写出每步的导数值），并说出最终收敛到哪里。",
+                "reference_answer": "f'(w)=2(w-3)。第一步：w₁=0−0.2×(−6)=1.2；第二步：w₂=1.2−0.2×2×(1.2−3)=1.2+0.72=1.92；继续迭代收敛到最低点 w=3。",
             },
             "near_transfer": {
-                "question": "调节淋浴水温：水太烫就往冷水方向拧一点，还烫再拧一点。这个过程和梯度下降有什么对应关系？「拧多了来回跳」对应什么问题？",
-                "reference_answer": "「舒适温度」是目标最低点，每次朝减小偏差的方向调整 = 沿负梯度更新；拧多了来回冷热震荡 = 学习率过大导致不收敛。",
+                "question": "同样的函数改用 η=2.5 会发生什么？用「步长 vs 曲线坡度」解释，并给出一个判断学习率过大的实用信号。",
+                "reference_answer": "步子太大反复越过最低点，w 在 3 两侧来回震荡甚至发散（例如 w₂=1.2−2.5×2×(1.2−3)=10.2，直接跳到另一侧更远处）。信号：loss 不降反升或剧烈震荡。",
             },
             "far_transfer": {
-                "question": "为什么下山策略可能会停在一个「小坑」（局部最低点）而不是真正的谷底？这说明梯度下降有什么固有局限？",
-                "reference_answer": "因为每一步只看局部最陡方向，走到小坑后四周都比脚下高，就再也找不到更低的谷底；说明梯度下降只能保证收敛到局部极小值，不保证全局最优。",
+                "question": "为什么不干脆把学习率设得极小（如 1e-9）来保证绝不震荡？这会付出什么代价？实际系统怎么折中？",
+                "reference_answer": "极小步长下每步几乎不动，收敛需要的更新次数爆炸（可能永不完成）；实际用学习率调度/自适应步长（先大后小），在稳定性和速度间折中。",
             },
         },
     },
     "fz-001": {
+        "student_level": "mid",
         "gold": {
             "skill": "fuzzy-understanding",
             "learner_state": "representation_gap",
@@ -121,20 +130,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "矩阵 A 把平面逆时针旋转 90°，矩阵 B 把所有向量横坐标拉伸 2 倍。BA 作用在向量 (1,0) 上结果是什么？这体现乘法的什么含义？",
-                "reference_answer": "先做 B：(1,0)→(2,0)；再旋转 90°：(2,0)→(0,2)。所以 BA(1,0)=(0,2)。体现「矩阵乘法 = 变换的依次复合（右边的先作用）」。",
+                "question": "A=[[0,-1],[1,0]]（逆时针转 90°）。用「A 对基向量做了什么」解释 A 的两列各是什么，并用基向量合成算出 A·(2,1)。",
+                "reference_answer": "A·(1,0)=(0,1)（第一列），A·(0,1)=(-1,0)（第二列）；A·(2,1)=2·A·(1,0)+1·A·(0,1)=2(0,1)+(-1,0)=(-1,2)。列 = 基向量的像，任意向量 = 列的线性组合。",
             },
             "near_transfer": {
-                "question": "为什么交换律 AB=BA 一般不成立？用「先穿袜子再穿鞋」之外的一个几何例子说明。",
-                "reference_answer": "变换的先后顺序影响结果：例如「先旋转 90° 再横向拉伸 2 倍」和「先拉伸再旋转」作用在同一个向量上终点不同，所以复合顺序不可交换。",
+                "question": "B=[[2,0],[0,3]]。分别计算 B·A·(1,1) 和 A·B·(1,1)，说明每步几何动作，并解释为什么结果不同。",
+                "reference_answer": "BA(1,1)：先拉伸 (1,1)→(2,3)，再旋转→(-3,2)。AB(1,1)：先旋转 (1,1)→(-1,1)，再拉伸→(-2,3)。先旋转会改变拉伸轴的方向，两种顺序复合结果不同，故 BA≠AB。",
             },
             "far_transfer": {
-                "question": "把「矩阵=变换、乘法=复合」的观点迁移到函数上：若 f(x)=2x，g(x)=x+1，f∘g 和 g∘f 在 x=1 处的值分别是多少？这说明什么？",
-                "reference_answer": "f∘g(1)=f(2)=4，g∘f(1)=g(2)=3，两者不同；和矩阵一样，复合运算有顺序，函数复合与矩阵乘法是同一种「先做后者再做前者」的结构。",
+                "question": "把「矩阵乘法=变换复合」迁移到一元函数：f(x)=x², g(x)=x+3。算 f(g(1)) 和 g(f(1))，并说明这对应矩阵乘法的哪个一般性质。",
+                "reference_answer": "f(g(1))=f(4)=16；g(f(1))=g(1)=4。函数复合有顺序且一般不可交换——与矩阵乘法同构（AB 是先 B 后 A 的复合），故一般 AB≠BA。",
             },
         },
     },
     "fz-006": {
+        "student_level": "mid",
         "gold": {
             "skill": "fuzzy-understanding",
             "learner_state": "concept_confusion",
@@ -151,20 +161,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "X 服从 [0,2] 上的均匀分布。f(x) 和 F(x) 分别是什么？P(0≤X≤1) 怎么用 f 算？f(0.5)=0.5 这个「0.5」是概率吗？",
-                "reference_answer": "f(x)=1/2（0≤x≤2），F(x)=x/2；P(0≤X≤1)=∫₀¹f=1/2，即区间上的面积。f(0.5)=0.5 是密度高度不是概率（均匀分布下单点概率为 0）。",
+                "question": "X 服从参数 1 的指数分布：f(x)=e^{-x}（x≥0）。验证 f 归一化，写出 F(x)，并解释为什么 f(2)≈0.135 不是「X=2 的概率」。",
+                "reference_answer": "∫₀^∞ e^{-x}dx=1（归一成立）；F(x)=1-e^{-x}。f(2) 是密度（每单位长度的密集程度），概率=密度对区间积分；单点区间宽度为 0，P(X=2)=0。",
             },
             "near_transfer": {
-                "question": "考试成绩近似正态分布，均值 70。为什么说「考 exactly 70.000… 分的概率是 0，但落在 68~72 的概率不是 0」？",
-                "reference_answer": "单点是零宽区间，CDF 差为 0，故单点概率为 0；68~72 是一段区间，其上密度曲线下有正的面积，所以概率为正——概率来自面积而非高度。",
+                "question": "人群身高密度在 170cm 处高于 150cm。为什么「随机抽一人身高恰好 170.000…cm」的概率是 0，而「169.5~170.5cm」的概率是正的？用「宽度×高度」说明。",
+                "reference_answer": "单点区间宽度为 0，面积（概率）=密度×宽度=0；169.5~170.5 宽 1cm，面积≈密度×1>0。密度不是概率，积分后的面积才是。",
             },
             "far_transfer": {
-                "question": "人口按身高的分布也可以画成一条「密度曲线」。为什么我们说「身高恰好 170.000…cm 的人几乎不存在，但 169.5~170.5cm 的人很多」？",
-                "reference_answer": "和概率密度同理：单点区间宽度为 0、面积为 0；小区间面积=密度×宽度为正。密度描述的是「每单位长度的密集程度」，不是某一点的人数/概率。",
+                "question": "泊松分布（单位时间内事件数）也有一条钟形曲线。要算「下一秒恰好来 2 个事件」的概率，能用概率密度吗？写出正确的计算式结构。",
+                "reference_answer": "不能。泊松是离散分布，没有 PDF；应使用概率质量函数 P(N=2)=e^{-λ}λ²/2!（λ 为单位时间均值）。「曲线」要区分 PMF（离散、可直接读概率）与 PDF（连续、需积分）。",
             },
         },
     },
     "fz-012": {
+        "student_level": "low",
         "gold": {
             "skill": "fuzzy-understanding",
             "learner_state": "symbol_gap",
@@ -181,20 +192,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "f(x,y)=x²y，求 ∂f/∂x 和 ∂f/∂y，并说明计算时你把什么当成了常数。",
-                "reference_answer": "∂f/∂x=2xy（把 y 当常数）；∂f/∂y=x²（把 x 当常数）。∂ 的含义就是固定其余变量、只对目标变量求变化率。",
+                "question": "f(x,y)=x²y+sin(y)。求 ∂f/∂x 和 ∂f/∂y，每一步说明把哪个变量当成了常数。",
+                "reference_answer": "∂f/∂x=2xy（把 y 当常数，sin(y) 对 x 求导为 0）；∂f/∂y=x²+cos(y)（把 x 当常数，x² 对 y 求导为 0）。",
             },
             "near_transfer": {
-                "question": "房间舒适度取决于温度和湿度。用「固定一个、动另一个」的语言解释如何考察温度对舒适度的影响，这对应什么符号操作？",
-                "reference_answer": "让湿度不变、只改变温度看舒适度变化快慢，即舒适度对温度的偏导数 ∂comfort/∂temperature——多元函数中固定其余自变量的变化率。",
+                "question": "理想气体 V(T,P)=nRT/P。说出 ∂V/∂T 和 ∂V/∂P 各自「固定了什么」，并算出两个表达式。",
+                "reference_answer": "∂V/∂T=nR/P（固定 P）：定压下每升 1 度体积增加 nR/P；∂V/∂P=−nRT/P²（固定 T）：定温下加压体积按 P² 反比缩小。",
             },
             "far_transfer": {
-                "question": "一元函数 y=f(x) 里为什么从来不用 ∂ 而只用 d？",
-                "reference_answer": "因为一元函数只有一个自变量，没有「其他变量需要固定」，普通导数 dy/dx 已完整；∂ 专门用于多元情形以区分「对哪一个变量、其余固定」。",
+                "question": "一元函数 y=f(x) 的导数也是随 x 变化的。既然如此，∂f/∂x「是一个数还是一条函数」？∂ 和 d 的区别到底在哪一层？",
+                "reference_answer": "∂f/∂x 一般仍是 (x,y) 的函数——每个点有自己的偏导数。d 与 ∂ 的区别不在「数还是函数」，而在多元时必须声明「对哪个变量、其余固定」；一元只有一个变量，无需区分。",
             },
         },
     },
     "fz-019": {
+        "student_level": "mid",
         "gold": {
             "skill": "fuzzy-understanding",
             "learner_state": "representation_gap",
@@ -211,20 +223,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "某病患病率 1%，检测灵敏度 99%、假阳性率 5%。某人检测阳性，用贝叶斯更新估计其患病概率（先验→后验），并指出哪一项是「先验」。",
-                "reference_answer": "后验 = 0.99×0.01 / (0.99×0.01+0.05×0.99) ≈ 16.7%。患病率 1% 是先验（看检测前），阳性证据把信念从 1% 更新到约 17%。",
+                "question": "工厂次品率 1%。检测器对次品 95% 报阳、对正品 10% 误报。某人报阳，用贝叶斯算他真是次品的概率，并指出分子、分母各代表什么。",
+                "reference_answer": "0.95×0.01/(0.95×0.01+0.10×0.99)=0.0095/0.1085≈8.8%。分子=「是次品且报阳」的概率；分母=「报阳」的全部路径（次品报阳+正品误报）。先验 1% 被证据更新到约 8.8%。",
             },
             "near_transfer": {
-                "question": "垃圾邮件过滤器对「中奖」一词很敏感。解释它收到新邮件时如何用「先验→证据→后验」的过程决定是否拦截。",
-                "reference_answer": "先验：新邮件是垃圾邮件的基础比例；证据：出现「中奖」一词在垃圾/正常邮件中的likelihood；后验：结合后得到「是垃圾邮件」的更新概率并据此拦截。",
+                "question": "他又独立做了第二次检测，仍然报阳。用「上一次的后验=这一次的先验」算新的后验，并说明证据是如何迭代更新信念的。",
+                "reference_answer": "以 0.088 为新先验：0.95×0.088/(0.95×0.088+0.10×0.912)≈0.0836/0.1748≈47.8%。贝叶斯更新是链式的：每次证据把上一次后验当新先验，两次报阳把 1% 推到约 48%。",
             },
             "far_transfer": {
-                "question": "「第一印象就像先验，新行为就像证据」——用贝叶斯更新的语言解释为什么一次极端表现不应完全推翻对一个人的判断。",
-                "reference_answer": "后验由先验和证据的可靠性共同决定：单次极端事件 likelihood 低（也可能是偶然），合理更新应小幅调整信念而非全盘替换——这正是贝叶斯「温和更新」的语义。",
+                "question": "「头奖有人中过，所以买彩票中头奖没那么离谱」——用先验/似然/基数的语言解释这句话错在哪。",
+                "reference_answer": "错误在忽略基数与条件化：「有人中奖」是亿万人各买一注下的必然结果（对整体而言概率≈1），但对单个具体的人，先验极小、在「买了票」条件下后验仍然极小；把总体必然性误当个体概率。",
             },
         },
     },
     "ps-001": {
+        "student_level": "mid",
         "gold": {
             "skill": "problem-solving",
             "learner_state": "strategy_missing",
@@ -241,20 +254,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "求 lim(x→0) (eˣ - 1 - x - x²/2)/x³。",
-                "reference_answer": "泰勒展开 eˣ=1+x+x²/2+x³/6+o(x³)，分子余 x³/6+o(x³)，除以 x³ 得 1/6。",
+                "question": "求 lim(x→0) (cos x − 1 + x²/2)/x⁴。写明你选的方法和理由，分步执行到最终值。",
+                "reference_answer": "0/0 型且差式含高阶小量，选泰勒：cos x = 1 − x²/2 + x⁴/24 + o(x⁴)，分子 = x⁴/24 + o(x⁴)，除以 x⁴ 得极限 1/24。洛必达要连做四次，泰勒一次看清。",
             },
             "near_transfer": {
-                "question": "求 lim(x→0) (sin x - x)/x³，并说明你选择的方法及为什么。",
-                "reference_answer": "sin x = x - x³/6 + o(x³)，分子 -x³/6+o(x³)，极限 = -1/6；选泰勒因为差式含不同阶小量，展开后主项直接可见。",
+                "question": "求 lim(x→0) (tan x − x)/x³，并说明为什么这里洛必达一次后反而更复杂、泰勒更直接。",
+                "reference_answer": "tan x = x + x³/3 + o(x³)，分子 = x³/3 + o(x³)，极限 = 1/3。若用洛必达：(sec²x−1)/3x² 仍需再处理 sec²−1=tan²x，绕路；泰勒直接暴露 x³ 主项。",
             },
             "far_transfer": {
-                "question": "物理实验中测得位移 s(t)=t³/6 近似自由落体在极短时间内的情况。用泰勒的思想解释：为什么「在 t=0 附近用低阶多项式近似函数」在实验科学里有用？",
-                "reference_answer": "泰勒展开把复杂函数在一点附近分解为常数+线性+二阶……项，小时间尺度上高阶项可忽略，于是用低阶多项式（如 s≈½gt²）即可足够好地预测系统行为。",
+                "question": "单摆小角度近似 sin θ ≈ θ 用到了泰勒。说明误差是几阶的，并估计 θ=0.5rad 时近似带来的相对误差量级。",
+                "reference_answer": "sin θ = θ − θ³/6 + o(θ⁵)，误差主项 θ³/6，相对误差约 θ²/6。θ=0.5 时 ≈0.042，约 4%——小角度下可忽略，角度大时必须用完整 sin。",
             },
         },
     },
     "ps-006": {
+        "student_level": "mid",
         "gold": {
             "skill": "problem-solving",
             "learner_state": "strategy_missing",
@@ -271,20 +285,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "序列 [1, 3, 2, 4]：写出每个位置的 dp 值（dp[i]=以 i 结尾的 LIS 长度）并给出 LIS 长度。",
-                "reference_answer": "dp = [1, 2, 2, 3]；dp[3]=max(dp[1]+1=3, dp[2]+1=3)=3。LIS 长度 = max dp = 3（如 1,3,4）。",
+                "question": "序列 [2, 5, 3, 4, 8, 7]：写出每个位置的 dp 值（以 i 结尾的 LIS 长度），指出 dp[4]（元素 8）的转移来源，并给出 LIS 长度。",
+                "reference_answer": "dp = [1, 2, 2, 3, 4, 4]。dp[4]（8）= dp[3]（4）+1 = 4，来源 2<4<8 链。LIS 长度 = max dp = 4（如 2,3,4,8）。注意最后一个 7 的 dp 也是 4（7<8 不能接在 8 后）。",
             },
             "near_transfer": {
-                "question": "若改成求「最长非递减子序列」（允许相等），转移条件要改哪里？",
-                "reference_answer": "只把比较条件从 a[j]<a[i] 放宽为 a[j]≤a[i]，其余结构不变——状态定义与答案取法都保持。",
+                "question": "换成「最长公共子序列 LCS(a,b)」：状态应该定义成什么（含两个下标）？写出 a[i]==b[j] 与不等时的两个转移。",
+                "reference_answer": "dp[i][j] = a 前 i 个与 b 前 j 个的 LCS 长度。a[i]==b[j]：dp[i][j]=dp[i-1][j-1]+1；否则 dp[i][j]=max(dp[i-1][j], dp[i][j-1])。同样是「固定结尾」消除后效性。",
             },
             "far_transfer": {
-                "question": "把「以 i 结尾」这种状态设计思想迁移到「连续子数组最大和」（Kadane）：状态该怎么定？转移是什么？",
-                "reference_answer": "定义 f[i]=以 i 结尾的最大子数组和；转移 f[i]=max(a[i], f[i-1]+a[i])；同样靠「固定结尾位置」消除后效性，答案取所有 f[i] 的最大值。",
+                "question": "有同学把状态定义为「前 i 个数里选出的 LIS 长度」而推不出转移。用「转移时缺了什么信息」解释这个状态为什么失败，「以 i 结尾」补上了什么。",
+                "reference_answer": "「前 i 个随便选」没有记录选中的最后一个元素，转移时无法判断新元素能否接上去（比较对象未知）——信息不足导致后效。「以 i 结尾」固定了最后一块信息，使每个子问题自洽可转移。",
             },
         },
     },
     "ps-011": {
+        "student_level": "mid",
         "gold": {
             "skill": "problem-solving",
             "learner_state": "strategy_missing",
@@ -301,20 +316,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "数组 [1,2,2,2,3] 中找「最后一个等于 2」的下标。按左闭右闭约定，a[mid]==target 时应该 l=mid+1 还是 r=mid-1？最终答案是多少？",
-                "reference_answer": "找最后一个：命中后继续向右，l=mid+1 并记录 ans=mid。最终下标 3（0-based）。",
+                "question": "数组 [1,2,2,2,3]：按左闭右闭约定分别写出「找第一个 2」和「找最后一个 2」中 a[mid]==2 时的更新方向（一个 l=mid+1，一个 r=mid-1，谁是谁？）与最终返回下标。",
+                "reference_answer": "找第一个 2：命中后继续向左收缩，r=mid−1 并记录 ans=mid，最终下标 1；找最后一个 2：命中后继续向右，l=mid+1 记录 ans，最终下标 3。方向由「要第一个还是最后一个」决定。",
             },
             "near_transfer": {
-                "question": "有序数组中找「第一个大于等于 target」的位置（lower_bound）。循环里 a[mid]≥target 时如何更新？",
-                "reference_answer": "a[mid]≥target 时 r=mid-1 并记录候选，否则 l=mid+1；结束时记录的候选即第一个 ≥ target 的位置（同「找第一个 2」同一不变量，target 换成泛化条件）。",
+                "question": "有序数组 [1,3,5,7] 中找「第一个 ≥6 的位置」（数组里没有 6）。用同一套不变量写过程，返回什么？这对应 C++ 的哪个标准函数？",
+                "reference_answer": "条件泛化为 a[mid]≥6 即收缩右半并记录：最终返回下标 3（元素 7），即 6 应插入的位置。这正是 lower_bound 语义——「找第一个 2」是它取 target=2 的特例。",
             },
             "far_transfer": {
-                "question": "用二分答案的思路：把木材切成 k 段、每段长度不超过 L 时需要检查「长度 L 可行」。说明为什么「解对 L 单调」是能用二分的前提。",
-                "reference_answer": "二分要求判定函数单调（L 越大越难满足）：若 L 可行则更小的 L 也可行。有了单调性，就可以像有序数组一样对 L 二分搜索边界值。",
+                "question": "「把长度 L 的木头切成段、要求段数 ≥ k」——证明 L 的可行性关于 L 单调，因此可以对 L 二分；再把目标改成「段数恰好等于 k」，说明单调性为什么失效。",
+                "reference_answer": "L 越大每段越长、段数越少：若 L 可行（段数≥k）则更小的 L 也可行，可行集是前缀 → 单调，可二分最大可行 L。「恰好 =k」时可行集两侧都不可行、不是前缀/后缀，二分前提被破坏。",
             },
         },
     },
     "ps-020": {
+        "student_level": "mid",
         "gold": {
             "skill": "problem-solving",
             "learner_state": "strategy_missing",
@@ -331,20 +347,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "两人轮流抛硬币，先抛出正面者胜，每次正面率 1/2。第一个抛的人获胜概率是多少？用无穷级数或递归论证。",
-                "reference_answer": "P = 1/2 + (1/4)P ⇒ P = 2/3；或级数 1/2·Σ(1/4)ᵏ = (1/2)/(1-1/4) = 2/3。",
+                "question": "甲乙轮流投篮，甲命中率 1/2、乙 1/3，甲先投。列出甲获胜概率的方程（或级数）并解出具体值。",
+                "reference_answer": "P = 1/2（甲首轮中）+ (1/2)(2/3)·P（双双未中后局面重现）⇒ P(1−1/3)=1/2 ⇒ P=3/4。或级数 Σ (1/3)^k·(1/2)。",
             },
             "near_transfer": {
-                "question": "上题若第一个人的硬币正面率是 1/3，第二个人仍是 1/2，谁更占优？列式比较。",
-                "reference_answer": "P1 = (1/3)/(1-(2/3)(1/2)) = (1/3)/(2/3) = 1/2，第二人 P2=1/2；平局，说明先手优势会被低命中率抵消。",
+                "question": "若甲先投但命中率只有 1/4、乙 1/2，谁占优？算出两人的获胜概率。",
+                "reference_answer": "P甲 = (1/4)/(1−(3/4)(1/2)) = (1/4)/(5/8) = 2/5；P乙 = 3/5。先手优势被低命中率抵消，乙反而占优——占优与否由「首轮成功率/全失败率」之比决定。",
             },
             "far_transfer": {
-                "question": "为什么这类「轮流尝试直到成功」的问题天然出现无穷等比级数？举一个生活场景并用一句话算出其结构。",
-                "reference_answer": "因为每一轮「全部失败」后局面等比重现，成功概率按公比 q=(全失败率) 逐轮缩放：P=首轮成功率·(1+q+q²+…)=首轮成功率/(1-q)，如反复投简历面试的情形。",
+                "question": "把规则改成「每人最多投 3 轮，总分高者胜」。为什么无穷级数方法在这里失效？应该换成什么建模工具？",
+                "reference_answer": "有限轮没有「全失败后局面等比重现」的无穷结构，级数的公比结构消失；应改为按轮次的有限状态递推/枚举（DP 或决策树），逐轮累加得分分布。",
             },
         },
     },
     "mr-001": {
+        "student_level": "low",
         "gold": {
             "skill": "mistake-review",
             "learner_state": "concept_error",
@@ -361,20 +378,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "解不等式 x² > 9，并说明你如何避免上次丢分支的错误。",
-                "reference_answer": "x<-3 或 x>3。方法：把 x² 与常数比较转成 |x|>3 或图像在 y=3 上方，两侧都要取，不复现「只取正支」。",
+                "question": "解 x² ≥ 9，写出完整解集，并演示一个自检动作证明你没有再丢分支。",
+                "reference_answer": "x≤−3 或 x≥3。自检：等价于 |x|≥3；或代 x=−4（满足）进原式检验 16≥9 ✓——负支必须保留。",
             },
             "near_transfer": {
-                "question": "解不等式 x² < 4。它的解为什么是一个区间而不是两个分支？",
-                "reference_answer": "-2<x<2。因为 |x|<2 时 x 被夹在 ±2 之间；小于号对应「中间区域」，与大于号的双分支结构相反。",
+                "question": "解 (x−1)² < 4。这次解是双分支还是区间？为什么与上一题结构相反？",
+                "reference_answer": "|x−1|<2 ⇒ −1<x<3，是区间。平方项小于正数意味着点落在两根「之间」（图像在 y=4 下方），大于号才产生两侧分支。",
             },
             "far_transfer": {
-                "question": "函数定义域问题：f(x)=√(x²-9) 的定义域是什么？这和本题的丢分支错误有什么联系？",
-                "reference_answer": "x²-9≥0 ⇒ x≤-3 或 x≥3，同样是「平方与常数比较」的双分支结构；若只取正支就会漏掉 x≤-3。",
+                "question": "求 √(2x−1) + √(3−x) 有意义的 x 范围，指出每个约束各自贡献了区间的哪一端。",
+                "reference_answer": "需 2x−1≥0 且 3−x≥0 ⇒ x≥1/2 且 x≤3，即 [1/2, 3]。左端点来自第一个根号，右端点来自第二个根号——丢掉任何一侧约束都会截错区间。",
             },
         },
     },
     "mr-003": {
+        "student_level": "mid",
         "gold": {
             "skill": "mistake-review",
             "learner_state": "concept_error",
@@ -391,20 +409,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "判断 ∫₀¹ ln x dx 是否收敛；若收敛求值。说明你先检查了什么。",
-                "reference_answer": "先检查瑕点 x=0：lim ln x = −∞ 但 ln x 可积。∫₀¹ ln x dx = [x ln x − x]₀¹ = −1 + lim(x→0⁺) x ln x = −1，收敛于 −1。",
+                "question": "判断 ∫₁^∞ 1/x^p dx 对哪些 p 收敛，写出极限过程的关键表达式。",
+                "reference_answer": "p≠1 时 ∫₁^t x^{−p}dx = (t^{1−p}−1)/(1−p)；t→∞ 时仅当 1−p<0（p>1）收敛，值为 1/(p−1)；p=1 时 ln t→∞ 发散。结论：p>1 收敛，p≤1 发散。",
             },
             "near_transfer": {
-                "question": "∫₋₁¹ 1/x dx 直接套原函数得 0，对吗？按瑕积分流程给出正确判断。",
-                "reference_answer": "不对。拆成 ∫₋₁⁰ + ∫₀¹，两个发散（对数发散）；虽然对称「主值」为 0，但普通瑕积分定义下发散——每一侧必须分别取极限。",
+                "question": "同样的幂换成区间 (0,1] 上的 ∫₀¹ 1/x^p dx：敛散条件如何反转？指出这次的问题点在哪个端点。",
+                "reference_answer": "问题点在瑕点 x=0：∫_ε¹ x^{−p}dx 在 ε→0⁺ 时仅当 1−p>0（p<1）有有限极限。结论反转：p<1 收敛，p≥1 发散——与无穷端恰好互补。",
             },
             "far_transfer": {
-                "question": "物理中「点电荷所在处的电势能」为什么不能直接代入公式计算？这和本题的瑕点问题有什么相似？",
-                "reference_answer": "点电荷处 r→0 时势能 ∝1/r 发散，公式只适用于 r>0；与瑕积分一样，模型在奇点处失效，必须避开奇点或用极限/截断方式处理。",
+                "question": "p-级数 Σ 1/n^p 的敛散性与 ∫₁^∞ 1/x^p 完全一致。积分判别法依赖被积函数的哪三个性质？为什么能「以积判级」？",
+                "reference_answer": "要求 f 在 [1,∞) 正、连续、单调递减。此时部分和 Σ₂ⁿ f(k) 被夹在 ∫₁ⁿ f 与 ∫₂^{n+1} f 之间，级数与积分同敛散——p-级数结论直接继承。",
             },
         },
     },
     "mr-008": {
+        "student_level": "low",
         "gold": {
             "skill": "mistake-review",
             "learner_state": "concept_error",
@@ -421,20 +440,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "int a[5] 的合法下标范围是什么？a[5] 会发生什么？",
-                "reference_answer": "合法下标 0..4；a[5] 是越界访问，属未定义行为——可能崩溃、可能静默改写相邻内存，编译器不保证报错。",
+                "question": "char buf[8] 要装字符串 \"abcdefg\"（7 个字母）。写出合法下标范围，'\\0' 存在下标几？此时 buf[7] 还能再写吗？",
+                "reference_answer": "合法下标 0..7 共 8 字节；7 个字母占 0..6，'\\0' 在下标 7。buf[7] 作为「下标位置」在数组内（不是越界），但它已经是 '\\0'——再写入会覆盖终止符导致字符串无界，写 buf[8] 才是真越界。",
             },
             "near_transfer": {
-                "question": "用 for 循环遍历长度为 n 的数组，循环条件写 i<=n 会怎样？应写什么？",
-                "reference_answer": "i<=n 会访问 a[n] 越界；应写 i<n（0-based）或明确改用 1-based 语义并相应分配 n+1 空间。",
+                "question": "for (int i = 0; i <= strlen(s); i++) s[i] = toupper(s[i])：哪些 i 是安全读？哪个 i 的写入会破坏字符串但不是越界？为什么编译器不报错？",
+                "reference_answer": "读 0..strlen(s) 都安全（s[len] 是 '\\0'）；写 s[len] 覆盖 '\\0' 破坏终止符（之后 strlen 会失控），但仍不是越界访问。编译器只查类型不查运行时边界，所以不报错。",
             },
             "far_transfer": {
-                "question": "Python 列表 lst=[1,2,3] 中 lst[3] 会立即抛 IndexError，而 C 里 a[3]（大小 3）往往「看起来还能跑」。为什么两种语言表现不同？",
-                "reference_answer": "Python 运行时做边界检查并抛异常；C 为性能不做边界检查，越界是未定义行为，后果依赖内存布局——所以 C 的越界更危险，需要程序员自查。",
+                "question": "同样的越界写 C 里常「看起来能跑」，Python 的 lst[10] 立即抛 IndexError。两种语言行为差异的根源是什么？对定位 C 的这类 bug 意味着什么？",
+                "reference_answer": "C 为性能不做运行时边界检查，越界是未定义行为，后果取决于内存布局（可能静默破坏其他变量）；Python 运行时检查并立即抛错。所以 C 的越界 bug 常常延迟爆发、位置漂移，需要 ASan/Valgrind 这类工具或防御性自查。",
             },
         },
     },
     "mr-015": {
+        "student_level": "low",
         "gold": {
             "skill": "mistake-review",
             "learner_state": "concept_error",
@@ -451,20 +471,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "A=[[1,1],[0,1]]，B=[[1,0],[1,1]]，计算 AB 与 BA，验证它们不相等。",
-                "reference_answer": "AB=[[2,1],[1,1]]，BA=[[1,1],[1,2]]；两者不等，直接验证复合顺序影响结果。",
+                "question": "A=[[1,1],[0,1]]（剪切），B=[[2,0],[0,1]]（横向拉伸 2 倍）。算出 AB 与 BA，并用「先做什么变换、再做什么」解释两者为什么不同。",
+                "reference_answer": "AB=[[2,1],[0,1]]：先 B 后 A——先拉伸再剪切；BA=[[2,2],[0,1]]：先剪切再拉伸。剪切会复制 x 坐标进 y，两个顺序作用在不同坐标上，结果不同。",
             },
             "near_transfer": {
-                "question": "什么情况下 AB=BA 一定成立？举两类例子。",
-                "reference_answer": "如 A 与 I（单位阵）、A 与自身的幂（A 与 A²）、对角矩阵同阶相乘；共同点是变换「不互相干扰」或本质相同，可交换。",
+                "question": "D=diag(2,3) 与旋转 45° 的 R：DR 与 RD 是否相等？用「缩放的轴」和「旋转的轴」一句话解释。",
+                "reference_answer": "不相等。D 沿固定的坐标轴缩放；R 先把物体的轴转走，DR 是「转完再按原坐标轴拉伸」，RD 是「先拉伸再转」——缩放作用的轴不同，效果不同。",
             },
             "far_transfer": {
-                "question": "三维空间中「先绕 x 轴转 90° 再绕 y 轴转 90°」与反序执行结果不同。用这个事实解释为什么旋转矩阵乘法不可交换。",
-                "reference_answer": "旋转是线性变换，矩阵乘法就是复合；两个不同轴的旋转复合顺序不同，物体最终姿态不同（可用一本书翻转演示），故对应矩阵 AB≠BA。",
+                "question": "举一个 A、B 都不是单位阵、也不是彼此幂，但 AB=BA 的例子，并用计算验证。它们可交换的几何原因是什么？",
+                "reference_answer": "取同为对角阵：A=diag(2,3), B=diag(5,7)，AB=BA=diag(10,21)。几何上都是沿同一组坐标轴的缩放，先后顺序不影响结果——共享「特征方向」的变换可交换。",
             },
         },
     },
     "dp-001": {
+        "student_level": "high",
         "gold": {
             "skill": "deepening-learning",
             "learner_state": "representation_gap",
@@ -481,20 +502,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "信号 f(t)=sin(2πt)+0.5sin(6πt)，它的傅里叶变换在哪些频率上有峰？各峰相对高度反映什么？",
-                "reference_answer": "在 1 Hz 和 3 Hz 处各有一个峰；1 Hz 成分振幅 1、3 Hz 成分振幅 0.5，峰高（幅度谱）反映各频率成分的占比。",
+                "question": "对称方波（±1 交替）的傅里叶级数只含奇次谐波、系数 ∝1/n。用「奇函数在正弦/余弦基下的坐标」解释为什么余弦项全部消失，并说出吉布斯过冲出现在哪里。",
+                "reference_answer": "方波关于原点奇对称：偶函数（余弦）与它内积为零 → 余弦系数全 0，只留奇次正弦项。吉布斯过冲出现在每个跳变点两侧，约 9% 的固定过冲，随谐波数增加宽度变窄但不消失。",
             },
             "near_transfer": {
-                "question": "为什么音频软件能显示「频谱图」而不会把时间信息全部丢掉？短时傅里叶变换补了什么？",
-                "reference_answer": "普通傅里叶变换只给全局频率成分、丢失时间定位；STFT 对滑动窗口内信号做变换，得到「每个时间段里有哪些频率」，兼顾时间与频率。",
+                "question": "「时域卷积 = 频域相乘」——用「复指数是 LTI 系统的特征函数」解释这句话为什么成立，并据此说明低通滤波在频域该做什么操作。",
+                "reference_answer": "e^{iωt} 过 LTI 系统输出 H(ω)e^{iωt}（特征函数，特征值 H(ω)）。任意输入按频率展开后每条成分独立缩放，故时域卷积对应频域逐点乘 H(ω)；低通滤波 = 乘以低频段 1、高频段 0 的窗。",
             },
             "far_transfer": {
-                "question": "在图像压缩（JPEG 用 DCT）中，「换到另一组基上表示」的思想如何起作用？为什么换基能省空间？",
-                "reference_answer": "DCT 把图像从像素基换到空间频率基：自然图像能量集中在低频分量，高频系数大多接近 0，量化丢弃后几乎不损观感——换基让「重要信息集中、冗余可丢弃」，从而压缩。",
+                "question": "压缩感知用远低于 Nyquist 的采样数重建信号。用「信号在某个基下稀疏」解释这为什么可能，傅里叶基在这个故事里承担什么角色？",
+                "reference_answer": "若信号在某个变换基（常见即频域）只有 k 个大系数（稀疏），远少于 Nyquist 的随机线性测量仍携带全部信息，可用 L1 最小化找回稀疏解。傅里叶基提供与测量基不相干、能量集中的表示空间。",
             },
         },
     },
     "dp-005": {
+        "student_level": "high",
         "gold": {
             "skill": "deepening-learning",
             "learner_state": "representation_gap",
@@ -511,20 +533,21 @@ GOLD = {
         },
         "post_test": {
             "isomorphic": {
-                "question": "掷一枚公平骰子：点数的期望是多少？它和「掷 6000 次的平均点数」是什么关系？",
-                "reference_answer": "期望 = (1+2+…+6)/6 = 3.5；掷 6000 次的样本均值会接近 3.5（大数定律），但通常不恰好等于。",
+                "question": "X 服从参数 λ=2 的指数分布。算出 E[X] 与中位数，说明哪个更「典型」以及为什么两者差距这么大。",
+                "reference_answer": "E[X]=1/λ=0.5；中位数 m 满足 1−e^{−2m}=0.5 ⇒ m=ln2/2≈0.347。分布右偏（长尾在右侧）把均值拉离典型值，中位数更抗尾部影响，此时中位数更能代表「典型等待时间」。",
             },
             "near_transfer": {
-                "question": "彩票：99% 概率中 0 元，1% 概率中 1 万元。期望是多少？「期望为正所以值得买」这个推理还缺什么考量？",
-                "reference_answer": "期望 = 0.01×10000 = 100 元（假设票价低于 100 则期望为正）；但还要考虑风险偏好/效用与方差：99% 的情况血本无归，期望不描述典型单次结果。",
+                "question": "方案 A：50% 概率得 100 元、50% 得 0；方案 B：100% 得 45 元。A 的期望更高，但多数人选 B。用期望、方差、效用函数三个概念解释这个选择，并指出期望最大化在什么前提下才正确。",
+                "reference_answer": "E[A]=50>45，但 Var[A] 大；风险厌恶者的效用函数是凹的，E[U(A)]<U(E[A])，故选确定的小额。期望最大化仅在「风险中性」或「可大量独立重复（大数定律摊平方差）」时才是最优准则。",
             },
             "far_transfer": {
-                "question": "某公司平均工资 3 万/月，但大多数员工只有 1 万。用分布的语言解释「平均」为什么会产生误导，以及用什么统计量更稳健。",
-                "reference_answer": "工资分布严重右偏，少数高薪把均值拉离典型水平；此时均值≠分布的「中心体验」，用中位数/分位数更稳健，因为它对尾部不敏感。",
+                "question": "保险公司卖出期望赔付 90 元的保单收 100 元保费：公司为什么敢卖、个人为什么愿意买？「90 元」这个期望对双方的意义有什么本质不同？",
+                "reference_answer": "公司承保海量独立保单，大数定律使总赔付收敛到期望，90→100 的差是稳定利润（聚合视角，期望是可实现的长期均值）；个人只买一次，买的是风险转移——用确定的小损失替换灾难性大损失（个体视角，期望不描述他的单次体验）。",
             },
         },
     },
     "wd-001": {
+        "student_level": "mid",
         "gold": {
             "skill": "word-deep-dive",
             "learner_state": "word_depth_missing",
@@ -541,6 +564,7 @@ GOLD = {
         },
     },
     "tm-001": {
+        "student_level": "low",
         "gold": {
             "skill": "text-memorizer",
             "learner_state": "memorization_missing",
@@ -557,6 +581,7 @@ GOLD = {
         },
     },
     "sp-001": {
+        "student_level": "low",
         "gold": {
             "skill": "study-plan-builder",
             "learner_state": "constraint_unmapped",
@@ -582,6 +607,7 @@ def main() -> None:
         annotation = GOLD.get(case["id"])
         if not annotation:
             continue
+        case["student_level"] = annotation["student_level"]
         case["gap_type"] = annotation["gold"]["learner_state"]
         case["gold"] = annotation["gold"]
         if "post_test" in annotation:
@@ -591,7 +617,10 @@ def main() -> None:
         raise SystemExit(f"expected to annotate {len(GOLD)} cases, matched {annotated}")
     with PATH.open("w", encoding="utf-8") as f:
         f.write("\n".join(json.dumps(c, ensure_ascii=False) for c in cases) + "\n")
-    print(f"annotated {annotated} cases with gold/post_test")
+    from collections import Counter
+
+    levels = Counter(c["student_level"] for c in cases if c["id"] in GOLD)
+    print(f"annotated {annotated} cases (v2: harder post-tests + student_level); levels={dict(levels)}")
 
 
 if __name__ == "__main__":

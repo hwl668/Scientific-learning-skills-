@@ -31,8 +31,8 @@ from pathlib import Path
 from learning_agent.bench.api import APIError, make_client
 from learning_agent.bench.cases import load_cases
 from learning_agent.bench.prompts import (
-    JUDGE_SYSTEM_PROMPT_V1,
-    POST_TEST_JUDGE_SYSTEM_PROMPT_V1,
+    JUDGE_SYSTEM_PROMPT_V2,
+    POST_TEST_JUDGE_SYSTEM_PROMPT_V2,
     parse_strict_json,
 )
 from learning_agent.bench.runner import DEFAULT_OUTPUT_ROOT, file_sha256  # noqa: F401  (file_sha256 re-exported for tests)
@@ -64,7 +64,8 @@ def build_transcript(record: dict, learner_record: dict | None) -> str:
 
 def judge_record(client, case: dict, response_text: str, max_tokens: int) -> dict:
     gold = case.get("gold") or {}
-    gold_block = json.dumps(gold, ensure_ascii=False) if gold else "（无 gold 标注）"
+    gold_block = {**gold, "student_level": case.get("student_level", "（未标注）")}
+    gold_block = json.dumps(gold_block, ensure_ascii=False) if gold_block else "（无 gold 标注）"
     user = (
         f"## Learner question\n{case['text']}\n\n"
         f"## Gold metadata\n{gold_block}\n\n"
@@ -72,7 +73,7 @@ def judge_record(client, case: dict, response_text: str, max_tokens: int) -> dic
     )
     budget = max_tokens
     for attempt in range(3):
-        result = client.complete(JUDGE_SYSTEM_PROMPT_V1, user, max_tokens=budget)
+        result = client.complete(JUDGE_SYSTEM_PROMPT_V2, user, max_tokens=budget)
         try:
             parsed = parse_strict_json(result["text"])
             break
@@ -91,7 +92,9 @@ def judge_record(client, case: dict, response_text: str, max_tokens: int) -> dic
         "scores": {k: parsed.get(k) for k in (
             "correctness",
             "diagnostic_precision",
+            "mistake_location",
             "explanation_relevance",
+            "no_reveal",
             "cognitive_load",
             "hint_quality",
             "misconception_handling",
@@ -129,7 +132,7 @@ def grade_learner_record(client, case: dict, learner_record: dict, max_tokens: i
     user = "Grade this simulated student's post-test:\n" + json.dumps(block, ensure_ascii=False, indent=2)
     budget = max_tokens
     for attempt in range(3):
-        result = client.complete(POST_TEST_JUDGE_SYSTEM_PROMPT_V1, user, max_tokens=budget)
+        result = client.complete(POST_TEST_JUDGE_SYSTEM_PROMPT_V2, user, max_tokens=budget)
         try:
             parsed = parse_strict_json(result["text"])
             break

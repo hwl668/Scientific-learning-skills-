@@ -34,7 +34,9 @@ from learning_agent.bench.runner import DEFAULT_OUTPUT_ROOT
 DIMENSIONS = (
     "correctness",
     "diagnostic_precision",
+    "mistake_location",
     "explanation_relevance",
+    "no_reveal",
     "cognitive_load",
     "hint_quality",
     "misconception_handling",
@@ -43,13 +45,16 @@ DIMENSIONS = (
 POST_TEST_TIERS = ("isomorphic", "near_transfer", "far_transfer")
 DIMENSION_LABELS_ZH = {
     "correctness": "Correctness 学科正确性",
-    "diagnostic_precision": "Diagnosis 诊断命中",
+    "diagnostic_precision": "Diagnosis 诊断命中 (Mistake ID)",
+    "mistake_location": "Mistake location 卡点定位",
     "explanation_relevance": "Relevance 解释靶向",
+    "no_reveal": "No-reveal 不剧透",
     "cognitive_load": "Cognitive load 认知负荷",
     "hint_quality": "Hint quality 引导质量",
     "misconception_handling": "Misconceptions 误区处理",
     "transfer_quality": "Transfer 变式迁移",
 }
+LEVEL_LABELS_ZH = {"low": "初学者 low", "mid": "进阶 mid", "high": "高阶 high"}
 
 
 def _mean(values: list) -> float | None:
@@ -69,6 +74,19 @@ def aggregate(run_dir: Path) -> dict:
         raise ValueError(f"{run_dir}: no valid judgements to aggregate (run bench.judge first)")
 
     conditions: dict[str, dict] = {}
+    case_levels: dict[str, str | None] = {}
+    cases_file = run_config.get("cases_file")
+    if cases_file and Path(cases_file).exists():
+        from learning_agent.bench.cases import load_cases
+
+        try:
+            case_levels = {c["id"]: c.get("student_level") for c in load_cases(Path(cases_file))}
+        except Exception:
+            case_levels = {}
+
+    def _level_of(record: dict) -> str:
+        return case_levels.get(record["case_id"]) or "unlabeled"
+
     for condition in run_config["conditions"]:
         records = [j for j in judgements if j["condition"] == condition]
         if not records:
@@ -87,6 +105,28 @@ def aggregate(run_dir: Path) -> dict:
             }
             corrected = [j.get("misconception_corrected") for j in post]
             agg["misconception_correction_rate"] = _mean([1.0 if v is True else 0.0 if v is False else None for v in corrected])
+
+        # Stratified by authored learner level (low/mid/high): a beginner harmed by
+        # diagnosis must stay visible instead of dissolving into the average.
+        by_level: dict[str, dict] = {}
+        for level in ("low", "mid", "high", "unlabeled"):
+            level_records = [j for j in records if _level_of(j) == level]
+            if not level_records:
+                continue
+            level_agg: dict = {"n_cases": len(level_records)}
+            for dim in ("diagnostic_precision", "no_reveal", "cognitive_load", "explanation_relevance", "transfer_quality"):
+                level_agg[dim] = _mean([j.get("scores", {}).get(dim) for j in level_records])
+            level_post = [j for j in level_records if isinstance(j.get("post_test"), dict)]
+            if level_post:
+                level_agg["misconception_correction_rate"] = _mean(
+                    [1.0 if j.get("misconception_corrected") is True else 0.0 if j.get("misconception_corrected") is False else None for j in level_post]
+                )
+                level_agg["post_test_mean"] = _mean(
+                    [v for j in level_post for v in (j.get("post_test") or {}).values() if isinstance(v, (int, float))]
+                )
+            by_level[level] = level_agg
+        if any(level != "unlabeled" for level in by_level):
+            agg["by_level"] = by_level
         conditions[condition] = agg
 
     base_tokens = conditions.get("base", {}).get("output_tokens_mean")
@@ -190,6 +230,35 @@ def render_markdown(report: dict) -> str:
                 lines.append(
                     f"| {condition_names[condition]} | " + " | ".join(cells) + f" | {'—' if mc is None else f'{mc:.0%}'} |"
                 )
+
+        # Stratified view: same diagnostic treatment can help advanced and hurt
+        # beginners (McMiner: +15.9pp vs −12.2pp); averages must not hide that.
+        strat = [(c, conditions[c].get("by_level") or {}) for c in order if conditions[c].get("by_level")]
+        if strat:
+            lines += [
+                "",
+                "## 按学习者水平分层（case 标注的 student_level）",
+                "",
+                "> 平均分会掩盖「同一诊断对初学者有害」的风险，此表必须与总体表一起阅读。",
+                "",
+                "| 水平 | 条件 | n | Diagnosis | No-reveal | Cog. load | Relevance | Transfer | 后测均分 | 误解纠正 |",
+                "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+            ]
+            for level in ("low", "mid", "high", "unlabeled"):
+                for condition, by_level in strat:
+                    level_agg = by_level.get(level)
+                    if not level_agg:
+                        continue
+                    cells = [
+                        "—" if level_agg.get(k) is None else f"{level_agg[k]:.2f}"
+                        for k in ("diagnostic_precision", "no_reveal", "cognitive_load", "explanation_relevance", "transfer_quality")
+                    ]
+                    pt = "—" if level_agg.get("post_test_mean") is None else f"{level_agg['post_test_mean']:.2f}"
+                    mc = "—" if level_agg.get("misconception_correction_rate") is None else f"{level_agg['misconception_correction_rate']:.0%}"
+                    lines.append(
+                        f"| {LEVEL_LABELS_ZH.get(level, level)} | {condition_names[condition]} | {level_agg['n_cases']} | "
+                        + " | ".join(cells) + f" | {pt} | {mc} |"
+                    )
     return "\n".join(lines) + "\n"
 
 

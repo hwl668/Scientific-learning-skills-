@@ -12,6 +12,11 @@ Bench case schema (JSONL, one case per line):
     optional fields
       gap_type         str, coarse卡点类型 label
       origin           str, provenance for real/half-real cases (e.g. "MathDial#17")
+      student_level    one of "low" | "mid" | "high" — the learner proficiency the
+                       case authors intended; reports stratify by it so diagnosis
+                       harm to beginners is not hidden in averages (McMiner: the
+                       same diagnostic prompt helped advanced (+15.9pp) and hurt
+                       beginners (−12.2pp))
       student_context  {"prior_knowledge": [str, ...], "notes": str}
       gold             {"skill": str,                # must equal intended_skill
                         "learner_state": str,        # e.g. "representation_gap"
@@ -34,6 +39,7 @@ from pathlib import Path
 from learning_agent.router import SKILLS
 
 BENCH_SOURCES = ("real", "half-real", "synthetic")
+STUDENT_LEVELS = ("low", "mid", "high")
 
 SUB_SKILLS = tuple(skill for skill in SKILLS if skill != "scientific-learning")
 
@@ -63,6 +69,10 @@ def _field_errors(case: dict, where: str) -> list[str]:
     source = case.get("source")
     if isinstance(source, str) and source not in BENCH_SOURCES:
         errors.append(f"{where}: source {source!r} must be one of {', '.join(BENCH_SOURCES)}")
+
+    level = case.get("student_level")
+    if level is not None and level not in STUDENT_LEVELS:
+        errors.append(f"{where}: student_level {level!r} must be one of {', '.join(STUDENT_LEVELS)}")
 
     for field in OPTIONAL_DICT_FIELDS:
         if field in case and not isinstance(case[field], dict):

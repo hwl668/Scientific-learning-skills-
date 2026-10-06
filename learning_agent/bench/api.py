@@ -143,13 +143,13 @@ class MockClient:
 
     def complete(self, system: str | None, user: str, max_tokens: int, temperature: float = 0.0) -> dict:
         from learning_agent.bench.prompts import (
-            JUDGE_SYSTEM_PROMPT_V1,
+            JUDGE_SYSTEM_PROMPT_V2,
             LEARNER_DIAG_SYSTEM_PROMPT_V1,
             LEARNER_POSTTEST_SYSTEM_PROMPT_V1,
-            POST_TEST_JUDGE_SYSTEM_PROMPT_V1,
+            POST_TEST_JUDGE_SYSTEM_PROMPT_V2,
         )
 
-        if system == JUDGE_SYSTEM_PROMPT_V1:
+        if system == JUDGE_SYSTEM_PROMPT_V2:
             units = [
                 {"id": "E1", "text": "mock: diagnostic statement", "addresses_gap": True},
                 {"id": "E2", "text": "mock: targeted explanation", "addresses_gap": True},
@@ -157,9 +157,10 @@ class MockClient:
             ]
             text = json.dumps(
                 {
-                    "correctness": 4, "diagnostic_precision": 4, "explanation_relevance": 4,
-                    "cognitive_load": 4, "hint_quality": 4, "misconception_handling": 4,
-                    "transfer_quality": 4, "diagnosis_found": "mock diagnosis",
+                    "correctness": 4, "diagnostic_precision": 4, "mistake_location": 4,
+                    "explanation_relevance": 4, "no_reveal": 4, "cognitive_load": 4,
+                    "hint_quality": 4, "misconception_handling": 4, "transfer_quality": 4,
+                    "diagnosis_found": "mock diagnosis",
                     "units": units, "notes": "mock judge output (pipeline test only)",
                 },
                 ensure_ascii=False,
@@ -172,7 +173,7 @@ class MockClient:
                 {"tier": tier, "answer": f"mock learner answer for {tier}"} for tier in tiers if tier in user
             ]
             text = json.dumps({"answers": answers}, ensure_ascii=False)
-        elif system == POST_TEST_JUDGE_SYSTEM_PROMPT_V1:
+        elif system == POST_TEST_JUDGE_SYSTEM_PROMPT_V2:
             tiers = {
                 tier: {"correct": 1, "reason": "mock grading"} for tier in ("isomorphic", "near_transfer", "far_transfer") if tier in user
             }
