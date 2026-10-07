@@ -257,7 +257,7 @@ Learned router 的训练报告应与数据集指纹、切分策略一起阅读�
 
 > 上图由 [`bench-card` workflow](./.github/workflows/bench-card.yml) 从 `evals/bench/results/` 自动渲染，数字始终与已提交报告一致；诚实边界与逐项解读见该 run 的 `report.md` 与 [`docs/learning-skill-bench.md`](./docs/learning-skill-bench.md)。
 
-**证据现状**：LearningSkillBench v0.1 已实施（`learning_agent/bench/` 的 runner / judge / report，prompt 冻结随 `run.json` 发布），并在 20 个 case 上产出了第一份真实模型三条件对照报告；数据分层与防污染约定见 [`docs/learning-skill-bench.md`](./docs/learning-skill-bench.md)。pilot 的诚实摘要：skills 条件在**变式迁移**（4.75 vs base 4.00）与**输出效率**（0.82×）上占优；其余 Level 2 维度受 judge 天花板与自评限制区分度不足，Level 3 后测存在天花板效应——详见报告及其「诚实边界」。除该报告明确标注的指标外，本 README 不展示任何效果提升数字；模拟学习者结果不等同于真实学习效果。
+**证据现状**：LearningSkillBench v0.1 已实施（`learning_agent/bench/` 的 runner / judge / report，prompt 冻结随 `run.json` 发布），两份真实模型三条件报告并存：[pilot20-v1](./evals/bench/results/pilot20-v1.md)（API judge，存档）与 [pilot20-v2](./evals/bench/results/pilot20-v2.md)（诊断预算修复后的验证轮）。v2 诚实摘要：Skills 条件在**诊断命中（4.90 vs 3.70/3.65）、解释靶向（5.00，v1 的失分项已反转）、引导质量（4.40）、误区处理（4.70）、变式迁移（4.00 vs 1.25/2.05）** 全面领先；**认知负荷仍是短板（3.15，输出 1.19× base）**——结构化输出本身有长度代价；Level 3 后测在加难+换弱学习者后仍全满分（天花板），且 learner 仅完成 10/60（API 余额中断）。**v2 的 judge 为 inline provisional（项目作者判分：非盲、不可复现）**，授权 API 额度后应重跑正式 judge；v1→v2 对比混杂了 prompt 修订/判分者更换/v1 数据缺陷，仅作方向性参考。除报告明确标注的指标外，本 README 不展示任何效果提升数字；模拟学习者结果不等同于真实学习效果。
 
 安全模型格式、完整哈希、切分限制和适用边界见 [`artifacts/README.md`](./artifacts/README.md)。
 

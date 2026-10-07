@@ -24,7 +24,7 @@
 - [x] 首次真实 pilot：20 case × 3 条件 ×（Level 2 judge + TER + Level 3 模拟学习者）→ `evals/bench/results/pilot20-v1.md`；README 证据段改为引用实测报告
 - [x] README 动态 demo：CSS 动画 SVG 分镜（`scripts/generate_demo_svg.py` + `docs/assets/demo-scenario.json`，zh/en × light/dark，reduced-motion 定格回退）+ bench-card.svg 由 `bench-card` workflow 从 `evals/bench/results/` 自动重渲（数字与已提交报告强一致，测试锁定）
 - [x] **调研驱动修订（2026-10-06）**：① 诊断预算——SKILL.md/RULES.md 从「追问 2-3 个问题」改为「内部推断 + 最多 1 个带假设的问题 + 初学者 0 个 + 输出只服务当前卡点」（治 pilot20-v1 中 Skills 输掉 Cognitive load/Relevance 的「前置税」问题，Khanmigo/McMiner 教训）；② 诊断引擎去「只靠手写案例」——+30 条 QATD-2k 式 distractor 案例（`scripts/expand_diagnosis_cases.py`，入库前必须被规则引擎正确分类，78/78）+ `docs/mae-calibration.md`（MaE 55 类→六类完整映射：42% 程序性误概念、迁移类单轮不可诊）③ bench v2——judge V2 吸收 MRBench 的 Mistake Location × No-reveal、`student_level` 分层报告、后测全部加难、`--learner-model` 弱模拟学习者
-- [x] pilot20-v2：验证诊断预算修复效果（对照 pilot20-v1），报告与 v1 并列入库
+- [x] pilot20-v2：诊断预算修复验证——Diagnosis 4.90 vs 3.70/3.65、Relevance 5.00（v1 失分反转）、Transfer 4.00 vs 1.25/2.05；认知负荷仍短板（3.15）、Level 3 天花板未破（learner 因 API 余额中断 10/60）；judge 为 inline provisional（作者判分，非盲不可复现），API judge 复核待授权 → `evals/bench/results/pilot20-v2.md`
 - [ ] v0.5 候选：放量 dev 全量 + public test；TER 人工 agreement 标注（30–50 条）；test.private holdout 解锁流程
 - [ ] 真机触发测试：8 个子 skill 的 description 在宿主中的触发/误触率
 - [ ] P2 候选：统一 learner state（跨 skill 学习者画像）、诊断六类扩成分类树 + 干预策略映射、学科误区包（subject packs）

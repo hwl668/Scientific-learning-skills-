@@ -73,7 +73,16 @@ def render(report: dict, theme: str) -> str:
     run_id = report["run_id"]
     subject = report.get("subject_model") or "?"
     n_cases = max((agg.get("n_cases") or 0) for agg in conditions.values())
-    judge = report.get("judge_model") or "self"
+    judge_full = report.get("judge_model") or "self"
+    judge = judge_full.split("(")[0].strip()
+    if "inline" in judge_full:
+        judge += " (provisional)"
+    accuracies = [
+        agg.get("post_test_accuracy", {}).get(t)
+        for agg in conditions.values()
+        for t in ("isomorphic", "near_transfer", "far_transfer")
+    ]
+    ceiling = bool(accuracies) and all(a == 1.0 for a in accuracies if a is not None)
 
     parts: list[str] = []
     parts.append(f'<rect x="0" y="0" width="{W}" height="{H}" rx="12" fill="{c["bg"]}" stroke="{c["border"]}"/>')
@@ -109,9 +118,10 @@ def render(report: dict, theme: str) -> str:
         y = row_y + 12
 
     footer_y = H - 16
+    ceiling_note = " · Level 3 后测全满分（天花板效应，无区分度）" if ceiling else ""
     parts.append(
         f'<text x="{MARGIN}" y="{footer_y}" font-size="9.5" fill="{c["dim"]}">'
-        "simulated-learner ≠ 真实学习效果 · LLM-as-judge（自评，天花板压缩区分度） · Level 3 后测三条件 100%（天花板效应）</text>"
+        f"simulated-learner ≠ 真实学习效果 · LLM-as-judge（{esc(judge)}，区分度受限）{ceiling_note}</text>"
     )
     parts.append(
         f'<text x="{MARGIN}" y="{footer_y - 14}" font-size="9.5" fill="{c["dim"]}">'

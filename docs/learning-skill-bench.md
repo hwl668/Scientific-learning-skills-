@@ -31,7 +31,7 @@
 | report（聚合表 + student_level 分层 + 诚实边界声明） | ✅ | `learning_agent/bench/report.py` |
 | 冻结 prompt（generic-tutor / judge V2 / learner，sha256 指纹随 run.json 发布） | ✅ | `learning_agent/bench/prompts.py` |
 | 首次真实 pilot（pilot20-v1，存档对照） | ✅ | `evals/bench/results/pilot20-v1.md` |
-| v2 pilot（诊断预算修复验证） | ✅ | `evals/bench/results/pilot20-v2.md` |
+| v2 pilot（诊断预算修复验证） | ✅ provisional | `evals/bench/results/pilot20-v2.md`——judge 为作者 inline 判分（非盲/不可复现），API judge 复核待授权；learner 中断于 10/60，Level 3 仅局部覆盖 |
 
 ### 数据分层与防污染
 
@@ -80,21 +80,26 @@ test.private holdout 刻意**不入库**：由维护者单独保存，在 dev/pu
 
 现有 10 维 rubric / validate 逻辑继续用，但**降级为门槛检查**，不作为主要证据。
 
-### Level 2 — 回答质量（LLM-as-judge，1–5 分）
+### Level 2 — 回答质量（LLM-as-judge，1–5 分，V2 九维）
 
-judge 模型与被测模型不同源（如被测用模型 X，judge 用模型 Y），输出结构化 JSON：
+judge 模型应与被测模型不同源（v2 pilot 受限于单一可用端点为同源自评，已披露），
+输出结构化 JSON。V2 维度（**加粗**为 v2 依据调研吸收的 MRBench 维度）：
 
 ```text
-correctness            学科事实是否正确（judge 需给理由）
-diagnostic_precision   诊断是否命中最可能的卡点（对照 intended_gap_type）
-explanation_relevance  解释是否针对卡点，而非泛泛而谈
-cognitive_load         是否一次塞入过多无关内容
-hint_quality           解题类：引导 vs 直接给答案
-misconception_handling 误区表是否真实、具体、可操作
-transfer_quality       变式题是否真正改变条件/场景而非换数字
+correctness             学科事实是否正确（judge 需给理由）
+diagnostic_precision    诊断是否命中最可能的卡点（对照 gold；= MRBench Mistake ID）
+mistake_location        **是否指明理解断裂的具体位置（哪一步/哪个表征）**
+explanation_relevance   解释是否针对卡点，而非泛泛而谈
+no_reveal               **是否在学生产出推理前不交出最终答案；纯解释类计 3（中性）**
+cognitive_load          是否塞入无关内容或堆叠超出单一卡点所需的结构
+hint_quality            解题类：引导 vs 直接给答案
+misconception_handling  误区表是否真实、具体、可操作
+transfer_quality        变式题是否真正改变条件/场景而非换数字
 ```
 
-judge prompt 需冻结、入库、随结果一起发布；对同一批输出跑 judge 一致性（同 judge 两次 + 第二 judge 抽样）。
+judge prompt 需冻结、入库、随结果一起发布（V2 含按 `student_level` 的校准指令：
+对 low 水平，「只追问不教学」在 cognitive_load / no_reveal 上扣分）；对同一批输出跑
+judge 一致性（同 judge 两次 + 第二 judge 抽样）仍为 v0.5 待办。
 
 ### Level 3 — 学习增益（本项目差异化的核心）
 
@@ -155,10 +160,12 @@ TODO（v0.2）：人工在 30–50 条输出上标注单元切分与 relevant �
 4. ✅ `learning_agent/bench/report.py`：聚合出 README 目标形态表
 5. ✅ 20 题真实 pilot → `evals/bench/results/pilot20-v1.md`（含 judge 一致性注记）；放量到 100 题与 public test 放到 v0.5
 
-### 命令（pilot20-v1 实际使用的协议）
+### 命令（pilot20-v2 实际使用的协议）
 
 > 推理型模型（如 deepseek-v4-pro）会把输出预算花在思考上，教学与判分调用都需要大预算；
-> 4096 及以下会出现空响应/截断（pilot 中已实际发生并全部重跑修正）。
+> 4096 及以下会出现空响应/截断（pilot20-v1 中已实际发生并全部重跑修正）。
+> `--learner-model deepseek-chat` 让模拟学习者用更弱的非推理模型（Level 3 更有区分度），
+> 教学轮仍由被测模型完成。
 
 ```bash
 # 0. 数据门禁（CI 同款）
@@ -166,13 +173,13 @@ python -m learning_agent.bench.validate_cases
 
 # 1. 生成三条件教学回复（--with-learner 同时跑 Level 3 两轮教学 + 后测）
 python -m learning_agent.bench.runner \
-  --cases evals/bench/dev.synthetic.jsonl --run-id pilot20-v1 --with-learner --max-tokens 16384 \
-  --judge-model deepseek-v4-pro \
+  --cases evals/bench/dev.synthetic.jsonl --run-id pilot20-v2 --with-learner --max-tokens 16384 \
+  --judge-model deepseek-v4-pro --learner-model deepseek-chat \
   --ids zb-001,zb-008,zb-014,fz-001,fz-006,fz-012,fz-019,ps-001,ps-006,ps-011, \
         ps-020,mr-001,mr-003,mr-008,mr-015,dp-001,dp-005,wd-001,tm-001,sp-001
 
 # 2. judge 判分（judge 模型与被测模型不同源时在 --judge-model 记录）
-python -m learning_agent.bench.judge --run-id pilot20-v1
+python -m learning_agent.bench.judge --run-id pilot20-v2
 
 # 3. 聚合报告（--copy-to 把聚合结果入库，原始输出留在 gitignore 的 artifacts/bench/）
 python -m learning_agent.bench.report --run-id pilot20-v1 --copy-to evals/bench/results

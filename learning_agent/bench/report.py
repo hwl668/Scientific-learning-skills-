@@ -99,6 +99,7 @@ def aggregate(run_dir: Path) -> dict:
             "output_tokens_mean": _mean([j.get("subject_output_tokens") for j in records]),
         }
         post = [j for j in records if isinstance(j.get("post_test"), dict)]
+        agg["n_post"] = len(post)
         if post:
             agg["post_test_accuracy"] = {
                 tier: _mean([p["post_test"].get(tier) for p in post]) for tier in POST_TEST_TIERS
@@ -212,23 +213,36 @@ def render_markdown(report: dict) -> str:
             accuracies = [agg["post_test_accuracy"].get(t) for _, agg in post_rows for t in POST_TEST_TIERS]
             if accuracies and all(a == 1.0 for a in accuracies if a is not None):
                 lines.append(
-                    "\n> ⚠️ **天花板效应**：三条件后测均为满分——模拟学习者（强模型）在当前后测难度上"
-                    "已无提升空间，Level 3 正确率不构成条件间差异的证据；仅误解纠正率尚有参考价值，"
-                    "且需更大样本。v0.5 应提高后测难度或换用更弱/更真实的模拟学习者。"
+                    "\n> ⚠️ **天花板效应（升级版披露）**：三条件后测均为满分。pilot20-v2 已同时采取"
+                    "「后测加难为多步计算/预测题」与「模拟学习者换用更弱模型」两项措施，数学类后测"
+                    "仍被强学习者全部答对——说明对 STEM 计算类任务，**只换弱模型不够**，v0.5 需要"
+                    "多轮追踪式评测（先学后测跨多会话）或真实学习者数据才能测出教学差异。"
                 )
+            coverage = " / ".join(
+                "{} n={}".format(condition_names[c], conditions[c].get("n_post", 0)) for c in order
+            )
             lines += [
                 "",
                 "## Level 3 — 模拟学习者后测（simulated-learner）",
                 "",
-                "| 条件 | 同构题 | near-transfer | far-transfer | 误解纠正率 |",
-                "|---|---:|---:|---:|---:|",
+                f"覆盖：{coverage}",
+            ]
+            partial = [c for c in order if conditions[c].get("n_post", 0) < conditions[c].get("n_cases", 0)]
+            if partial:
+                lines.append(
+                    "（注意：部分 case 的 learner 阶段未完成，Level 3 结论只对已完成的后测 case 成立）"
+                )
+            lines += [
+                "",
+                "| 条件 | n | 同构题 | near-transfer | far-transfer | 误解纠正率 |",
+                "|---|---:|---:|---:|---:|---:|",
             ]
             for condition, agg in post_rows:
                 acc = agg["post_test_accuracy"]
                 cells = ["—" if acc.get(tier) is None else f"{acc[tier]:.0%}" for tier in POST_TEST_TIERS]
                 mc = agg.get("misconception_correction_rate")
                 lines.append(
-                    f"| {condition_names[condition]} | " + " | ".join(cells) + f" | {'—' if mc is None else f'{mc:.0%}'} |"
+                    f"| {condition_names[condition]} | {agg.get('n_post', 0)} | " + " | ".join(cells) + f" | {'—' if mc is None else f'{mc:.0%}'} |"
                 )
 
         # Stratified view: same diagnostic treatment can help advanced and hurt

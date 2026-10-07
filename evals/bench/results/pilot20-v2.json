@@ -1,0 +1,205 @@
+{
+  "run_id": "pilot20-v2",
+  "mock": false,
+  "provider": "anthropic",
+  "subject_model": "deepseek-v4-pro[1m]",
+  "judge_model": "glm-inline-provisional (project author, non-blind, non-reproducible)",
+  "prompts": {
+    "generic_tutor": {
+      "sha256": "205ccfab524e2f93",
+      "chars": 78
+    },
+    "judge_system": {
+      "sha256": "3dc3346e645331d2",
+      "chars": 3677
+    },
+    "learner_diag_system": {
+      "sha256": "358bea5b536b5d39",
+      "chars": 372
+    },
+    "learner_diag_user_template": {
+      "sha256": "d62b191c88b59a21",
+      "chars": 152
+    },
+    "tutor_turn2_template": {
+      "sha256": "65525e8f15cad3e0",
+      "chars": 187
+    },
+    "learner_posttest_system": {
+      "sha256": "c4eb461743a9c428",
+      "chars": 424
+    },
+    "learner_posttest_user_template": {
+      "sha256": "3e91ddfcb64b1d2c",
+      "chars": 272
+    },
+    "post_test_judge_system": {
+      "sha256": "79161e9ee55d8aea",
+      "chars": 618
+    }
+  },
+  "cases_file": "evals\\bench\\dev.synthetic.jsonl",
+  "cases_file_sha256": "816adb2e3ae295d6",
+  "git_rev": "72855ae",
+  "n_judged": 60,
+  "conditions": {
+    "base": {
+      "n_cases": 20,
+      "dimension_means": {
+        "correctness": 5.0,
+        "diagnostic_precision": 3.65,
+        "mistake_location": 2.65,
+        "explanation_relevance": 4.2,
+        "no_reveal": 2.75,
+        "cognitive_load": 3.25,
+        "hint_quality": 2.05,
+        "misconception_handling": 2.0,
+        "transfer_quality": 1.25
+      },
+      "ter_mean": 0.91,
+      "ter_units_mean": 6.4,
+      "output_tokens_mean": 3592.4,
+      "post_test_accuracy": {
+        "isomorphic": 1.0,
+        "near_transfer": 1.0,
+        "far_transfer": 1.0
+      },
+      "misconception_correction_rate": 1.0,
+      "by_level": {
+        "low": {
+          "n_cases": 9,
+          "diagnostic_precision": 3.67,
+          "no_reveal": 2.89,
+          "cognitive_load": 3.78,
+          "explanation_relevance": 4.0,
+          "transfer_quality": 1.33,
+          "misconception_correction_rate": 1.0,
+          "post_test_mean": 1.0
+        },
+        "mid": {
+          "n_cases": 9,
+          "diagnostic_precision": 3.56,
+          "no_reveal": 2.56,
+          "cognitive_load": 3.0,
+          "explanation_relevance": 4.22,
+          "transfer_quality": 1.22,
+          "misconception_correction_rate": 1.0,
+          "post_test_mean": 1.0
+        },
+        "high": {
+          "n_cases": 2,
+          "diagnostic_precision": 4.0,
+          "no_reveal": 3.0,
+          "cognitive_load": 2.0,
+          "explanation_relevance": 5.0,
+          "transfer_quality": 1.0
+        }
+      },
+      "output_tokens_index_vs_base": 1.0
+    },
+    "generic-tutor": {
+      "n_cases": 20,
+      "dimension_means": {
+        "correctness": 5.0,
+        "diagnostic_precision": 3.7,
+        "mistake_location": 2.6,
+        "explanation_relevance": 4.6,
+        "no_reveal": 2.75,
+        "cognitive_load": 3.95,
+        "hint_quality": 3.0,
+        "misconception_handling": 2.15,
+        "transfer_quality": 2.05
+      },
+      "ter_mean": 0.97,
+      "ter_units_mean": 6.0,
+      "output_tokens_mean": 2469.15,
+      "post_test_accuracy": {
+        "isomorphic": 1.0,
+        "near_transfer": 1.0,
+        "far_transfer": 1.0
+      },
+      "misconception_correction_rate": 1.0,
+      "by_level": {
+        "low": {
+          "n_cases": 9,
+          "diagnostic_precision": 3.78,
+          "no_reveal": 2.89,
+          "cognitive_load": 4.44,
+          "explanation_relevance": 4.67,
+          "transfer_quality": 2.0,
+          "misconception_correction_rate": 1.0,
+          "post_test_mean": 1.0
+        },
+        "mid": {
+          "n_cases": 9,
+          "diagnostic_precision": 3.56,
+          "no_reveal": 2.56,
+          "cognitive_load": 3.67,
+          "explanation_relevance": 4.44,
+          "transfer_quality": 2.33
+        },
+        "high": {
+          "n_cases": 2,
+          "diagnostic_precision": 4.0,
+          "no_reveal": 3.0,
+          "cognitive_load": 3.0,
+          "explanation_relevance": 5.0,
+          "transfer_quality": 1.0
+        }
+      },
+      "output_tokens_index_vs_base": 0.69
+    },
+    "skills": {
+      "n_cases": 20,
+      "dimension_means": {
+        "correctness": 5.0,
+        "diagnostic_precision": 4.9,
+        "mistake_location": 3.85,
+        "explanation_relevance": 5.0,
+        "no_reveal": 3.2,
+        "cognitive_load": 3.15,
+        "hint_quality": 4.4,
+        "misconception_handling": 4.7,
+        "transfer_quality": 4.0
+      },
+      "ter_mean": 1.0,
+      "ter_units_mean": 10.4,
+      "output_tokens_mean": 4271.9,
+      "post_test_accuracy": {
+        "isomorphic": 1.0,
+        "near_transfer": 1.0,
+        "far_transfer": 1.0
+      },
+      "misconception_correction_rate": 1.0,
+      "by_level": {
+        "low": {
+          "n_cases": 9,
+          "diagnostic_precision": 5.0,
+          "no_reveal": 3.11,
+          "cognitive_load": 3.22,
+          "explanation_relevance": 5.0,
+          "transfer_quality": 3.89,
+          "misconception_correction_rate": 1.0,
+          "post_test_mean": 1.0
+        },
+        "mid": {
+          "n_cases": 9,
+          "diagnostic_precision": 4.78,
+          "no_reveal": 3.33,
+          "cognitive_load": 3.11,
+          "explanation_relevance": 5.0,
+          "transfer_quality": 4.11
+        },
+        "high": {
+          "n_cases": 2,
+          "diagnostic_precision": 5.0,
+          "no_reveal": 3.0,
+          "cognitive_load": 3.0,
+          "explanation_relevance": 5.0,
+          "transfer_quality": 4.0
+        }
+      },
+      "output_tokens_index_vs_base": 1.19
+    }
+  }
+}
